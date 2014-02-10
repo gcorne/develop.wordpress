@@ -539,7 +539,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 		}
 	});
 
-	editor.on( 'click', function( event ) {
+	editor.on( 'mouseup', function( event ) {
 		var node = event.target,
 			isToolbar;
 
