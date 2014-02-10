@@ -324,6 +324,8 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 
 		selected = false;
 
+	function isPlaceholder( img ) {
+		return editor.dom.hasClass( img, 'mceItem' ) || '1' === editor.dom.getAttrib( img, 'data-mce-placeholder' );
 	}
 
 	function addToolbar( img ) {
@@ -335,7 +337,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 		}
 
 		// Don't attempt to edit placeholders
-		if ( editor.dom.hasClass( img, 'mceItem' ) || '1' === editor.dom.getAttrib( img, 'data-mce-placeholder' ) ) {
+		if ( isPlaceholder( img ) ) {
 			return;
 		}
 
@@ -540,9 +542,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 		}
 
 		if ( node.nodeName === 'IMG' ) {
-
-			// Don't attempt to edit placeholders
-			if ( editor.dom.hasClass( node, 'mceItem' ) || '1' === editor.dom.getAttrib( node, 'data-mce-placeholder' ) ) {
+			if ( isPlaceholder() ) {
 				return;
 			}
 
