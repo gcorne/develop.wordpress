@@ -176,7 +176,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 	}
 
 	function updateImage( imageNode, imageData ) {
-		var className, width, node, html, captionNode, nodeToReplace, uid;
+		var className, width, node, html, captionNode, nodeToReplace, uid, updatedImgNode;
 
 		if ( imageData.caption ) {
 
@@ -217,13 +217,16 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 
 		editor.dom.setAttrib( node, 'data-wp-replace-id', '' );
 
-		editor.nodeChanged();
+		updatedImgNode = node;
 
-		if ( node.nodeName === 'IMG' ) {
-			editor.selection.select( node );
-		} else {
-			editor.selection.select( editor.dom.select( 'img', node )[0] );
+		if ( updatedImgNode.nodeName !== 'IMG' ) {
+			updatedImgNode = editor.dom.select( 'img', updatedImgNode )[0];
 		}
+
+		selected = updatedImgNode;
+		editor.selection.select( updatedImgNode );
+		addToolbar( updatedImgNode );
+		editor.nodeChanged();
 	}
 
 	function createImageAndLink( imageData, mode ) {
