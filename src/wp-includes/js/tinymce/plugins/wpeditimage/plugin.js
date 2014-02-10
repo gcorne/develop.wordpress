@@ -334,7 +334,6 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 	function addToolbar( img ) {
 		var position, toolbarHtml, toolbar;
 
-		removeToolbar();
 		if ( tinymce.Env.ie && tinymce.Env.ie <= 8 ) {
 			return;
 		}
@@ -344,6 +343,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			return;
 		}
 
+		removeToolbar();
 		position = editor.dom.getPos( img, editor.getBody() );
 		toolbarHtml = '<div class="wrapper" data-mce-bogus="1"><div class="dashicons dashicons-format-image edit" data-mce-bogus="1"></div> <div class="dashicons dashicons-no-alt remove" data-mce-bogus="1"></div></div>';
 
