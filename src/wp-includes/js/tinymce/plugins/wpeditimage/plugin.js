@@ -561,6 +561,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			isToolbar = editor.dom.getParent( node, '#wp-image-toolbar' ) ? true : false;
 
 			if ( selected && isToolbar ) {
+				event.preventDefault();
 				if ( editor.dom.hasClass( node, 'remove' ) ) {
 					removeImage( selected );
 					removeToolbar();
