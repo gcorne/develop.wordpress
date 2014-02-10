@@ -414,6 +414,10 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			if ( node.nodeName === 'IMG' && dom.getParent( node, '.wp-caption' ) ) {
 				event.preventDefault();
 			}
+
+			if ( event.target === selected ) {
+				removeToolbar();
+			}
 		});
 	});
 
