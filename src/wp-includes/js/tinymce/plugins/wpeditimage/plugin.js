@@ -340,8 +340,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 		}
 
 		position = editor.dom.getPos( img, editor.getBody() );
-
-		toolbarHtml = '<div class="wrapper"><div class="dashicons dashicons-format-image edit"></div> <div class="dashicons dashicons-no-alt remove"></div></div>';
+		toolbarHtml = '<div class="wrapper" data-mce-bogus="1"><div class="dashicons dashicons-format-image edit" data-mce-bogus="1"></div> <div class="dashicons dashicons-no-alt remove" data-mce-bogus="1"></div></div>';
 
 		toolbar = editor.dom.create( 'div', {
 			'id': 'wp-image-toolbar',
