@@ -285,19 +285,17 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 
 		callback = function( imageData ) {
 			updateImage( img, imageData );
-			editor.focus();
 		};
 
 		frame.state('image-details').on( 'update', callback );
 		frame.state('replace-image').on( 'replace', callback );
 		frame.on( 'close', function() {
-			editor.focus();
 			editor.selection.select( img );
+			img.focus();
 			editor.nodeChanged();
 		});
 
 		frame.open();
-
 	}
 
 	function removeImage( node ) {
