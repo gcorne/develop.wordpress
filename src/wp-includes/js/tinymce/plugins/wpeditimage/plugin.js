@@ -330,6 +330,9 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 		var position, toolbarHtml, toolbar;
 
 		removeToolbar();
+		if ( tinymce.Env.ie && tinymce.Env.ie <= 8 ) {
+			return;
+		}
 
 		// Don't attempt to edit placeholders
 		if ( editor.dom.hasClass( img, 'mceItem' ) || '1' === editor.dom.getAttrib( img, 'data-mce-placeholder' ) ) {
