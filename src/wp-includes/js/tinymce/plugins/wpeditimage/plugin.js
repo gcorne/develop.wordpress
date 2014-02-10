@@ -270,6 +270,10 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 	function editImage( img ) {
 		var frame, callback;
 
+		if ( ! wp || ! wp.media ) {
+			return;
+		}
+
 		frame = wp.media({
 			frame: 'image',
 			state: 'image-details',
