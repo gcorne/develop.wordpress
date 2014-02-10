@@ -506,12 +506,12 @@ function wp_print_media_templates() {
 		<div class="media-embed">
 			<div class="embed-image-settings">
 				<div class="thumbnail">
-					<img src="{{ data.model.url }}" draggable="false" />
+					<img src="{{{ data.model.url }}}" draggable="false" />
 				</div>
 
 				<div class="setting url">
 					<?php // might want to make the url editable if it isn't an attachment ?>
-					<input type="text" disabled="disabled" value="{{ data.model.url }}" />
+					<input type="text" disabled="disabled" value="{{{ data.model.url }}}" />
 				</div>
 
 				<?php
