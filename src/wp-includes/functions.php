@@ -1434,6 +1434,23 @@ function path_join( $base, $path ) {
 }
 
 /**
+ * Normalize a filesystem path.
+ *
+ * Replaces backslashes with forward slashes for Windows systems,
+ * and ensures no duplicate slashes exist.
+ *
+ * @since 3.9.0
+ *
+ * @param string $path Path to normalize.
+ * @return string Normalized path.
+ */
+function wp_normalize_path( $path ) {
+	$path = str_replace( '\\', '/', $path );
+	$path = preg_replace( '|/+|','/', $path );
+	return $path;
+}
+
+/**
  * Determines a writable directory for temporary files.
  * Function's preference is the return value of <code>sys_get_temp_dir()</code>,
  * followed by your PHP temporary upload directory, followed by WP_CONTENT_DIR,
@@ -4095,7 +4112,7 @@ function wp_auth_check_html() {
  *
  * @since 3.6.0
  */
-function wp_auth_check( $response, $data ) {
+function wp_auth_check( $response ) {
 	$response['wp-auth-check'] = is_user_logged_in() && empty( $GLOBALS['login_grace_period'] );
 	return $response;
 }

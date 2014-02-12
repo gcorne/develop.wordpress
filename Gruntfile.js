@@ -160,7 +160,8 @@ module.exports = function(grunt) {
 			tests: {
 				src: [
 					'tests/qunit/**/*.js',
-					'!tests/qunit/vendor/qunit.js'
+					'!tests/qunit/vendor/qunit.js',
+					'!tests/qunit/editor/**'
 				],
 				options: grunt.file.readJSON('tests/qunit/.jshintrc')
 			},
@@ -228,7 +229,10 @@ module.exports = function(grunt) {
 			}
 		},
 		qunit: {
-			files: ['tests/qunit/**/*.html']
+			files: [
+				'tests/qunit/**/*.html',
+				'!tests/qunit/editor/**'
+			]
 		},
 		phpunit: {
 			'default': {
@@ -305,7 +309,7 @@ module.exports = function(grunt) {
 				files: {
 					src: [
 						BUILD_DIR + '/**/*.js',
-						'!' + BUILD_DIR + '/wp-content/**/*.js',
+						'!' + BUILD_DIR + '/wp-content/**/*.js'
 					]
 				}
 			}
@@ -340,7 +344,10 @@ module.exports = function(grunt) {
 				}
 			},
 			test: {
-				files: ['tests/qunit/**'],
+				files: [
+					'tests/qunit/**',
+					'!tests/qunit/editor/**'
+				],
 				tasks: ['qunit']
 			}
 		}
