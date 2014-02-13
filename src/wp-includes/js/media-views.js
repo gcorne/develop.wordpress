@@ -390,7 +390,8 @@
 		 * @access private
 		 */
 		_renderTitle: function( view ) {
-			view.$el.text( this.get('title') || '' );
+			var title = this.get('title');
+			view.$el.html( title.html || title || '' );
 		},
 		/**
 		 * @access private
@@ -455,19 +456,21 @@
 				priority = this.get('priority');
 
 			if ( ! menuItem && title ) {
-				menuItem = { text: title };
-
-				if ( priority ) {
-					menuItem.priority = priority;
+				if ( title.text !== undefined ) {
+					menuItem = { text: title.text };
+				} else {
+					menuItem = { text: title };
 				}
+
+				if ( priority )
+					menuItem.priority = priority;
 			}
 
-			if ( ! menuItem ) {
+			if ( ! menuItem )
 				return;
-			}
 
 			view.set( this.id, menuItem );
-		}
+			}
 	});
 
 	_.each(['toolbar','content'], function( region ) {
