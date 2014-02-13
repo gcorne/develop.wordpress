@@ -5,6 +5,7 @@ var imageEdit = window.imageEdit = {
 	iasapi : {},
 	hold : {},
 	postid : '',
+	_view : {},
 
 	intval : function(f) {
 		return f | 0;
@@ -287,7 +288,9 @@ var imageEdit = window.imageEdit = {
 		});
 	},
 
-	open : function(postid, nonce) {
+	open : function( postid, nonce, view ) {
+		this._view = view;
+
 		var data, elem = $('#image-editor-' + postid), head = $('#media-head-' + postid),
 			btn = $('#imgedit-open-btn-' + postid), spin = btn.siblings('.spinner');
 
@@ -397,10 +400,22 @@ var imageEdit = window.imageEdit = {
 
 		this.iasapi = {};
 		this.hold = {};
-		$('#image-editor-' + postid).fadeOut('fast', function() {
-			$('#media-head-' + postid).fadeIn('fast');
-			$(this).empty();
-		});
+
+		// If we've loaded the editor in the context of a Media Modal, then switch to the previous view,
+		// whatever that might have been.
+		if ( this._view && 'object' === typeof this._view ){
+			this._view.cancel();
+		}
+
+		// In case we are not accessing the image editor in the context of a View, close the editor the old-skool way
+		else {
+			$('#image-editor-' + postid).fadeOut('fast', function() {
+				$('#media-head-' + postid).fadeIn('fast');
+				$(this).empty();
+			});
+		}
+
+
 	},
 
 	notsaved : function(postid) {

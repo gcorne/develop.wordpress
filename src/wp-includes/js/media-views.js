@@ -1938,7 +1938,7 @@
 
 		editImageContent: function() {
 			var selection = this.state().get('selection'),
-				view = new media.view.EditImage( { model: selection.single() } ).render();
+				view = new media.view.EditImage( { model: selection.single(), controller: this } ).render();
 
 			this.content.set( view );
 
@@ -2191,7 +2191,7 @@
 				return;
 			}
 
-			view = new media.view.EditImage( { model: attachment } ).render();
+			view = new media.view.EditImage( { model: attachment, controller: this } ).render();
 
 			this.content.set( view );
 
@@ -5337,9 +5337,9 @@
 		className: 'image-editor',
 		template: media.template('image-editor'),
 
-		initialize: function() {
-
+		initialize: function( options ) {
 			this.editor = window.imageEdit;
+			this.controller = options.controller;
 			media.View.prototype.initialize.apply( this, arguments );
 		},
 
@@ -5353,7 +5353,12 @@
 		},
 
 		loadEditor: function() {
-			this.editor.open( this.model.get('id'), this.model.get('nonces').edit );
+			this.editor.open( this.model.get('id'), this.model.get('nonces').edit, this );
+		},
+
+		cancel: function() {
+				var lastState = this.controller.lastState();
+				this.controller.setState( lastState );
 		}
 
 	});
