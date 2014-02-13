@@ -930,7 +930,7 @@
 			toolbar:    'featured-image',
 			title:      l10n.setFeaturedImageTitle,
 			priority:   60,
-			syncSelection: false
+			syncSelection: true
 		}, media.controller.Library.prototype.defaults ),
 
 		initialize: function() {
@@ -1078,7 +1078,9 @@
 		},
 
 		activate: function() {
-
+			if ( ! this.get('selection') ) {
+				this.set( 'selection', new media.model.Selection() );
+			}
 			this.syncSelection();
 		},
 
