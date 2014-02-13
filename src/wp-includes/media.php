@@ -1869,6 +1869,7 @@ function wp_prepare_attachment_for_js( $attachment ) {
 		'nonces'      => array(
 			'update' => false,
 			'delete' => false,
+			'crop' => false,
 		),
 		'editLink'   => false,
 	);
@@ -1880,6 +1881,9 @@ function wp_prepare_attachment_for_js( $attachment ) {
 
 	if ( current_user_can( 'delete_post', $attachment->ID ) )
 		$response['nonces']['delete'] = wp_create_nonce( 'delete-post_' . $attachment->ID );
+	
+	if ( current_user_can( 'edit_post', $attachment->ID ) )
+		$response['nonces']['crop'] = wp_create_nonce( 'crop-image_' . $attachment->ID );
 
 	if ( $meta && 'image' === $type ) {
 		$sizes = array();

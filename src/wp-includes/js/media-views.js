@@ -1,5 +1,5 @@
 /* global _wpMediaViewsL10n, confirm, getUserSetting, setUserSetting */
-(function($){
+(function($, wp){
 	var media = wp.media, l10n;
 
 	// Link any localized strings.
@@ -1267,8 +1267,7 @@
 		},
 
 		doCrop: function(attachment, callback) {
-			attachment.get('nonces').crop = customHeaderVars.nonce;
-			$.post(_wpCustomizeSettings.url.ajax, {
+			$.post(wp.ajax.settings.url, {
 				dataType: 'json',
 				action: 'header_crop',
 				data: attachment.toJSON()
@@ -5374,4 +5373,4 @@
 
 	});
 
-}(jQuery));
+}(jQuery, wp));
