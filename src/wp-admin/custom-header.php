@@ -819,29 +819,10 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		$attachment_id = absint( $_POST['attachment_id'] );
 		$original = get_attached_file($attachment_id);
 
-
-		$max_width = 0;
-		// For flex, limit size of image displayed to 1500px unless theme says otherwise
-		if ( current_theme_supports( 'custom-header', 'flex-width' ) )
-			$max_width = 1500;
-
-		if ( current_theme_supports( 'custom-header', 'max-width' ) )
-			$max_width = max( $max_width, get_theme_support( 'custom-header', 'max-width' ) );
-		$max_width = max( $max_width, get_theme_support( 'custom-header', 'width' ) );
-
-		if ( ( current_theme_supports( 'custom-header', 'flex-height' ) && ! current_theme_supports( 'custom-header', 'flex-width' ) ) || $_POST['width'] > $max_width )
-			$dst_height = absint( $_POST['height'] * ( $max_width / $_POST['width'] ) );
-		elseif ( current_theme_supports( 'custom-header', 'flex-height' ) && current_theme_supports( 'custom-header', 'flex-width' ) )
-			$dst_height = absint( $_POST['height'] );
-		else
-			$dst_height = get_theme_support( 'custom-header', 'height' );
-
-		if ( ( current_theme_supports( 'custom-header', 'flex-width' ) && ! current_theme_supports( 'custom-header', 'flex-height' ) ) || $_POST['width'] > $max_width )
-			$dst_width = absint( $_POST['width'] * ( $max_width / $_POST['width'] ) );
-		elseif ( current_theme_supports( 'custom-header', 'flex-width' ) && current_theme_supports( 'custom-header', 'flex-height' ) )
-			$dst_width = absint( $_POST['width'] );
-		else
-			$dst_width = get_theme_support( 'custom-header', 'width' );
+		extract( $this->get_header_dimensions( array(
+			'width' => $_POST['width'],
+			'height' => $_POST['height'],
+		) ) );
 
 		if ( empty( $_POST['skip-cropping'] ) )
 			$cropped = wp_crop_image( $attachment_id, (int) $_POST['x1'], (int) $_POST['y1'], (int) $_POST['width'], (int) $_POST['height'], $dst_width, $dst_height );
@@ -856,31 +837,17 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		/** This filter is documented in wp-admin/custom-header.php */
 		$cropped = apply_filters( 'wp_create_file_in_uploads', $cropped, $attachment_id ); // For replication
 
-		$parent = get_post($attachment_id);
-		$parent_url = $parent->guid;
-		$url = str_replace( basename( $parent_url ), basename( $cropped ), $parent_url );
+		$object = $this->create_attachment_object( $cropped, $attachment_id );
 
-		$size = @getimagesize( $cropped );
-		$image_type = ( $size ) ? $size['mime'] : 'image/jpeg';
-
-		// Construct the object array
-		$object = array(
-			'ID' => $attachment_id,
-			'post_title' => basename($cropped),
-			'post_content' => $url,
-			'post_mime_type' => $image_type,
-			'guid' => $url,
-			'context' => 'custom-header'
-		);
 		if ( ! empty( $_POST['create-new-attachment'] ) )
 			unset( $object['ID'] );
 
 		// Update the attachment
-		$attachment_id = wp_insert_attachment( $object, $cropped );
-		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $cropped ) );
+		$attachment_id = $this->insert_attachment( $object, $cropped );
 
 		$width = $dst_width;
 		$height = $dst_height;
+		$url = $object['guid'];
 		$this->set_header_image( compact( 'url', 'attachment_id', 'width', 'height' ) );
 
 		// cleanup
@@ -1040,5 +1007,94 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 
 		set_theme_mod( 'header_image', $default );
 		set_theme_mod( 'header_image_data', (object) $default_data );
+	}
+
+	/**
+	 * Calculate dst_width and dst_height based on what the currently selected theme supports.
+	 *
+	 * @return array dst_height and dst_width of header image.
+	 */
+	final public function get_header_dimensions( $dimensions ) {
+		$max_width = 0;
+		$width = absint( $dimensions['width'] );
+		$height = absint( $dimensions['height'] );
+		$theme_height = get_theme_support( 'custom-header', 'height' );
+		$theme_width = get_theme_support( 'custom-header', 'width' );
+		$has_flex_width = current_theme_supports( 'custom-header', 'flex-width' );
+		$has_flex_height = current_theme_supports( 'custom-header', 'flex-height' );
+		$has_max_width = current_theme_supports( 'custom-header', 'max-width' ) ;
+		$dst = array();
+
+		// For flex, limit size of image displayed to 1500px unless theme says otherwise
+		if ( $has_flex_width )
+			$max_width = 1500;
+
+		if ( $has_max_width )
+			$max_width = max( $max_width, get_theme_support( 'custom-header', 'max-width' ) );
+		$max_width = max( $max_width, $theme_width );
+
+		if ( $has_flex_height && ! $has_flex_width )
+			$dst['dst_height'] = absint( $height * ( $max_width / $width ) );
+		elseif ( $has_flex_height && $has_flex_width )
+			$dst['dst_height'] = $height;
+		else
+			$dst['dst_height'] = $theme_height;
+
+		if ( ( $has_flex_width && ! $has_flex_height ) || $width > $max_width )
+			$dst['dst_width'] = absint( $width * ( $max_width / $width ) );
+		elseif ( $has_flex_width && $has_flex_height )
+			$dst['dst_width'] = $width;
+		else
+			$dst['dst_width'] = $theme_width;
+
+		return $dst;
+	}
+
+	/**
+	 * Create an attachment 'object'.
+	 *
+	 * @param string $cropped Cropped image URL.
+	 * @param int $parent_attachment_id Attachment ID of parent image.
+	 *
+	 * @return array Attachment object.
+	 */
+	final public function create_attachment_object( $cropped, $parent_attachment_id ) {
+		$parent = get_post( $parent_attachment_id );
+		$parent_url = $parent->guid;
+		$url = str_replace( basename( $parent_url ), basename( $cropped ), $parent_url );
+
+		$size = @getimagesize( $cropped );
+		$image_type = ( $size ) ? $size['mime'] : 'image/jpeg';
+
+		$object = array(
+			'ID' => $parent_attachment_id,
+			'post_title' => basename($cropped),
+			'post_content' => $url,
+			'post_mime_type' => $image_type,
+			'guid' => $url,
+			'context' => 'custom-header'
+		);
+
+		return $object;
+	}
+
+	/**
+	 * Insert an attachment & its metadata.
+	 *
+	 * @param array $object Attachment object.
+	 * @param string $cropped Cropped image URL.
+	 *
+	 * @return int Attachment ID.
+	 */
+	final public function insert_attachment( $object, $cropped ) {
+		$attachment_id = wp_insert_attachment( $object, $cropped );
+		$metadata = wp_generate_attachment_metadata( $attachment_id, $cropped );
+		/**
+		 * Allows us to insert custom meta data for an attachment.
+		 *
+		 */
+		$metadata = apply_filters( 'wp_header_image_attachment_metadata', $metadata );
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+		return $attachment_id;
 	}
 }
