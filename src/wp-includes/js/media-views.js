@@ -5351,12 +5351,13 @@
 			_.bindAll( this, 'onImageLoad' );
 		},
 		ready: function() {
-			$('img#image-to-crop').on('load', this.onImageLoad);
+			this.$el.find('img').on('load', this.onImageLoad);
 			$(window).on('resize', _.debounce(this.onImageLoad, 250));
 		},
 		remove: function() {
-			$('img#image-to-crop').remove();
-			$('img#image-to-crop').off();
+			var img = this.$el.find('img');
+			img.remove();
+			img.off();
 			wp.media.View.prototype.remove.apply(this, arguments);
 		},
 		prepare: function() {
@@ -5371,7 +5372,7 @@
 				imgOptions = imgOptions(this.options.attachment, this.controller);
 			}
 			this.trigger('image-loaded');
-			this.controller.imgSelect = $('img#image-to-crop').imgAreaSelect(imgOptions);
+			this.controller.imgSelect = this.$el.find('img').imgAreaSelect(imgOptions);
 		}
 
 	});
