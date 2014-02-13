@@ -2071,7 +2071,23 @@ function wp_enqueue_media( $args = array() ) {
 		// Edit Image
 		'imageDetailsTitle'     => __( 'Image Details' ),
 		'imageReplaceTitle'     => __( 'Replace Image' ),
-		'imageDetailsCancel'     => __( 'Cancel Edit' )
+		'imageDetailsCancel'     => __( 'Cancel Edit' ),
+
+		// Crop Image
+		/* translators: title for Media Manager library view */
+		'chooseImage' => __( 'Choose Image', 'media-cropper' ),
+		/* translators: button to select an image from the MM library to crop */
+		'selectAndCrop' => __( 'Select and Crop', 'media-cropper' ),
+		/* translators: button to choose not to crop the selected image */
+		'skipCropping' => __( 'Skip Cropping', 'media-cropper' ),
+		/* translators: button to choose to crop the selected image */
+		'cropImage' => __( 'Crop Image', 'media-cropper' ),
+		/* translators: button label changes to this while the image is being cropped server-side */
+		'cropping' => __( 'Cropping...', 'media-cropper' ),
+		/* translators: suggested width of header image in pixels */
+		'suggestedWidth' => __( 'Suggested width is %d pixels.', 'media-cropper' ),
+		/* translators: suggested height of header image in pixels */
+		'suggestedHeight' => __( 'Suggested height is %d pixels.', 'media-cropper' ),
 	);
 
 	$settings = apply_filters( 'media_view_settings', $settings, $post );
