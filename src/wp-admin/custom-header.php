@@ -1033,14 +1033,14 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 			$max_width = max( $max_width, get_theme_support( 'custom-header', 'max-width' ) );
 		$max_width = max( $max_width, $theme_width );
 
-		if ( $has_flex_height && ! $has_flex_width )
+		if ( $has_flex_height && ( ! $has_flex_width || $max_width > $max_width ) )
 			$dst['dst_height'] = absint( $height * ( $max_width / $width ) );
 		elseif ( $has_flex_height && $has_flex_width )
 			$dst['dst_height'] = $height;
 		else
 			$dst['dst_height'] = $theme_height;
 
-		if ( ( $has_flex_width && ! $has_flex_height ) || $width > $max_width )
+		if ( $has_flex_width && ( ! $has_flex_height || $width > $max_width ) )
 			$dst['dst_width'] = absint( $width * ( $max_width / $width ) );
 		elseif ( $has_flex_width && $has_flex_height )
 			$dst['dst_width'] = $width;
