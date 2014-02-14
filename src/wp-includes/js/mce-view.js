@@ -20,7 +20,7 @@ window.wp = window.wp || {};
 			// The default properties used for objects with the `pattern` key in
 			// `wp.mce.view.add()`.
 			pattern: {
-				view: Backbone.View,
+				view: wp.Backbone.View,
 				text: function( instance ) {
 					return instance.options.original;
 				},
@@ -51,7 +51,7 @@ window.wp = window.wp || {};
 			// The default properties used for objects with the `shortcode` key in
 			// `wp.mce.view.add()`.
 			shortcode: {
-				view: Backbone.View,
+				view: wp.Backbone.View,
 				text: function( instance ) {
 					return instance.options.shortcode.string();
 				},
