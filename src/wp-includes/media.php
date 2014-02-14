@@ -2086,6 +2086,7 @@ function wp_enqueue_media( $args = array() ) {
 		'skipCropping' => __( 'Skip Cropping', 'media-cropper' ),
 		/* translators: button to choose to crop the selected image */
 		'cropImage' => __( 'Crop Image', 'media-cropper' ),
+		'cropYourImage' => __( 'Crop your image', 'media-cropper' ),
 		/* translators: button label changes to this while the image is being cropped server-side */
 		'cropping' => __( 'Cropping...', 'media-cropper' ),
 		/* translators: suggested width of header image in pixels */
