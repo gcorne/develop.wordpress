@@ -379,6 +379,10 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			return true;
 		}
 
+		if ( dom.getParent( node, '.wp-view-wrap' ) ) {
+			return true;
+		}
+
 		return false;
 	}
 
