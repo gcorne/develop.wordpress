@@ -1186,7 +1186,7 @@
 	media.controller.Cropper = media.controller.State.extend({
 		defaults: {
 			id: 'cropper',
-			title: 'Crop Image',
+			title: l10n.cropImage,
 			toolbar: 'crop',
 			content: 'crop',
 			router: false,
@@ -5362,7 +5362,7 @@
 		},
 		prepare: function() {
 			return {
-				title: 'Crop your image',
+				title: l10n.cropYourImage,
 				url: this.options.attachment.get('url')
 			};
 		},
