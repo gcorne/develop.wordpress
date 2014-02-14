@@ -9,6 +9,28 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig({
+		autoprefixer: {
+			options: {
+				browsers: ['Android >= 2.1', 'Chrome >= 21', 'Explorer >= 7', 'Firefox >= 17', 'Opera >= 12.1', 'Safari >= 6.0']
+			},
+			core: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: SOURCE_DIR,
+				src: [
+					'wp-admin/css/*.css',
+					'wp-includes/css/*.css'
+				]
+			},
+			colors: {
+				expand: true,
+				cwd: BUILD_DIR,
+				dest: BUILD_DIR,
+				src: [
+					'wp-admin/css/colors/*/colors.css'
+				]
+			}
+		},
 		clean: {
 			all: [BUILD_DIR],
 			dynamic: {
@@ -30,6 +52,9 @@ module.exports = function(grunt) {
 						src: [
 							'**',
 							'!**/.{svn,git}/**', // Ignore version control directories.
+							// Ignore unminified versions of external libs we don't ship:
+							'!wp-includes/js/backbone.js',
+							'!wp-includes/js/underscore.js',
 							'!wp-includes/version.php' // Exclude version.php
 						],
 						dest: BUILD_DIR
@@ -92,7 +117,6 @@ module.exports = function(grunt) {
 					'wp-admin/css/*.css',
 					'wp-includes/css/*.css',
 					// Exceptions
-					'!wp-admin/css/theme.css', // Temporary file
 					'!wp-admin/css/farbtastic.css'
 				]
 			},
@@ -160,7 +184,8 @@ module.exports = function(grunt) {
 			tests: {
 				src: [
 					'tests/qunit/**/*.js',
-					'!tests/qunit/vendor/qunit.js'
+					'!tests/qunit/vendor/qunit.js',
+					'!tests/qunit/editor/**'
 				],
 				options: grunt.file.readJSON('tests/qunit/.jshintrc')
 			},
@@ -190,9 +215,9 @@ module.exports = function(grunt) {
 					// Third party scripts
 					'!wp-admin/js/farbtastic.js',
 					'!wp-admin/js/iris.min.js',
-					'!wp-includes/js/backbone.min.js',
+					'!wp-includes/js/backbone*.js',
 					'!wp-includes/js/swfobject.js',
-					'!wp-includes/js/underscore.min.js',
+					'!wp-includes/js/underscore*.js',
 					'!wp-includes/js/zxcvbn.min.js',
 					'!wp-includes/js/colorpicker.js',
 					'!wp-includes/js/hoverIntent.js',
@@ -228,7 +253,10 @@ module.exports = function(grunt) {
 			}
 		},
 		qunit: {
-			files: ['tests/qunit/**/*.html']
+			files: [
+				'tests/qunit/**/*.html',
+				'!tests/qunit/editor/**'
+			]
 		},
 		phpunit: {
 			'default': {
@@ -296,7 +324,7 @@ module.exports = function(grunt) {
 			}
 		},
 		jsvalidate:{
-			options:{
+			options: {
 				globals: {},
 				esprimaOptions:{},
 				verbose: false
@@ -305,9 +333,20 @@ module.exports = function(grunt) {
 				files: {
 					src: [
 						BUILD_DIR + '/**/*.js',
-						'!' + BUILD_DIR + '/wp-content/**/*.js',
+						'!' + BUILD_DIR + '/wp-content/**/*.js'
 					]
 				}
+			}
+		},
+		imagemin: {
+			core: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				src: [
+					'wp-{admin,includes}/images/**/*.{png,jpg,gif,jpeg}',
+					'wp-includes/js/tinymce/skins/wordpress/images/*.{png,jpg,gif,jpeg}'
+				],
+				dest: SOURCE_DIR
 			}
 		},
 		watch: {
@@ -340,7 +379,10 @@ module.exports = function(grunt) {
 				}
 			},
 			test: {
-				files: ['tests/qunit/**'],
+				files: [
+					'tests/qunit/**',
+					'!tests/qunit/editor/**'
+				],
 				tasks: ['qunit']
 			}
 		}
@@ -355,7 +397,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('rtl', ['cssjanus:core', 'cssjanus:colors']);
 
 	// Color schemes task.
-	grunt.registerTask('colors', ['sass:colors']);
+	grunt.registerTask('colors', ['sass:colors', 'autoprefixer:colors']);
 
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
