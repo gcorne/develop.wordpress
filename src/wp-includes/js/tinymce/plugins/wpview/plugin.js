@@ -37,7 +37,7 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		editor.dom.bind(elem, 'beforedeactivate focusin focusout', function(e) {
 			e.stopPropagation();
 		});
-		editor.dom.bind(selected, 'beforedeactivate focusin focusout click ouseup', function(e) {
+		editor.dom.bind(selected, 'beforedeactivate focusin focusout click mouseup', function(e) {
 			e.stopPropagation();
 		});
 
