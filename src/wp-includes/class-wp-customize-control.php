@@ -691,6 +691,346 @@ class WP_Customize_Background_Image_Control extends WP_Customize_Image_Control {
 	}
 }
 
+class WP_Customize_Header_Image_Control extends WP_Customize_Control {
+	public $type = 'header';
+
+	public function __construct( $manager ) {
+		parent::__construct( $manager, 'header_image', array(
+			'label'    => __( 'Header Image' ),
+			'settings' => array(
+				'default' => 'header_image',
+				'data'    => 'header_image_data',
+			),
+			'section'  => 'header_image',
+			'context'  => 'custom-header',
+			'removed'  => 'remove-header',
+			'get_url'  => 'get_header_image',
+		) );
+
+	}
+
+	public function to_json() {
+		parent::to_json();
+	}
+
+	public function enqueue() {
+		wp_enqueue_media();
+
+		// Move to wp-includes/js
+		wp_enqueue_script( 'slimscroll',
+			'/wp-includes/js/jquery/jquery.slimscroll.js',
+			array(),
+			'1.3.1',
+			true	);
+
+		// Where does this go? wp-includes/js?
+		wp_register_script( 'custom-header-models',
+			'/wp-admin/js/header-models.js',
+			array( 'underscore', 'backbone' ),
+			'20131114',
+			true	);
+
+		// Where does this go? wp-includes/js?
+		wp_enqueue_script( 'custom-header-views',
+			'/wp-admin/js/header-views.js',
+			array( 'jquery', 'underscore', 'custom-header-models' ),
+			'20131028',
+			true	);
+		
+
+		wp_enqueue_script( 'imgareaselect' );
+		wp_enqueue_style( 'imgareaselect' );
+		
+		// Where do we put the CSS?
+		wp_enqueue_style( 'custom-header-style', plugins_url( 'css/style.css', __FILE__ ) );
+
+		$width = absint( get_theme_support( 'custom-header', 'width' ) );
+		$height = absint( get_theme_support( 'custom-header', 'height' ) );
+		$flex_height = absint( get_theme_support( 'custom-header', 'flex-height' ) );
+		$flex_width = absint( get_theme_support( 'custom-header', 'flex-width' ) );
+
+		// Needs an _
+		wp_localize_script( 'custom-header-views', 'customHeaderVars', array(
+			'width' => $width,
+			'height' => $height,
+			'flex-width' => $flex_width,
+			'flex-height' => $flex_height,
+			'currentImgSrc' => $this->get_current_image_src(),
+		) );
+
+		wp_localize_script( 'custom-header-views', '_wpCustomizeHeaderL10n', array(
+			/* translators: header images uploaded by user */
+			'uploaded' => __( 'uploaded' ),
+			/* translators: header images suggested by the current theme */
+			'default' => __( 'suggested' )
+		) );
+		
+		$this->prepare_control_urgh();
+		wp_localize_script( 'custom-header-models', '_wpCustomizeHeaderUploads', $this->uploaded_headers );
+		wp_localize_script( 'custom-header-models', '_wpCustomizeHeaderDefaults', $this->default_headers );
+
+		parent::enqueue();
+
+	}
+
+	public function get_default_header_images() {
+		global $custom_image_header;
+
+		// Get *the* default image if there is one
+		$default = get_theme_support( 'custom-header', 'default-image' );
+
+		if ( ! $default ) // If not,
+			return $custom_image_header->default_headers; // easy peasy.
+
+		$default = sprintf( $default,
+			get_template_directory_uri(),
+			get_stylesheet_directory_uri() );
+
+		$header_images = array();
+		$already_has_default = false;
+
+		// Get the whole set of default images
+		$default_header_images = $custom_image_header->default_headers;
+		foreach ( $default_header_images as $k => $h ) {
+			if ( $h['url'] == $default ) {
+				$already_has_default = true;
+				break;
+			}
+		}
+
+		// If *the one true image* isn't included in the default set, add it in
+		// first position
+		if ( ! $already_has_default ) {
+			$header_images['default'] = array(
+				'url' => $default,
+				'thumbnail_url' => $default,
+				'description' => 'Default'
+			);
+		}
+
+		// The rest of the set comes after
+		$header_images = array_merge( $header_images, $default_header_images );
+
+		return $header_images;
+	}
+
+	public function get_uploaded_header_images() {
+		$key = '_wp_attachment_custom_header_last_used_' . get_stylesheet();
+		$header_images = array();
+
+		$headers_not_dated = get_posts( array(
+			'post_type' => 'attachment',
+			'meta_key' => '_wp_attachment_is_custom_header',
+			'meta_value' => get_option('stylesheet'),
+			'orderby' => 'none',
+			'nopaging' => true,
+			'meta_query' => array(
+				array(
+					'key' => '_wp_attachment_is_custom_header',
+					'value' => get_option( 'stylesheet' ),
+					'compare' => 'LIKE'
+				),
+				array(
+					'key' => $key,
+					'value' => 'this string must not be empty',
+					'compare' => 'NOT EXISTS'
+				),
+			)
+		) );
+
+		$headers_dated = get_posts( array(
+			'post_type' => 'attachment',
+			'meta_key' => $key,
+			'orderby' => 'meta_value_num',
+			'order' => 'DESC',
+			'nopaging' => true,
+			'meta_query' => array(
+				array(
+					'key' => '_wp_attachment_is_custom_header',
+					'value' => get_option( 'stylesheet' ),
+					'compare' => 'LIKE'
+				),
+			),
+		) );
+
+		$limit = apply_filters( 'custom_header_uploaded_limit', 15 );
+		$headers = array_merge( $headers_dated, $headers_not_dated );
+		$headers = array_slice( $headers, 0, $limit );
+
+		foreach ( (array) $headers as $header ) {
+			$url = esc_url_raw( $header->guid );
+			$header_data = wp_get_attachment_metadata( $header->ID );
+			$timestamp = get_post_meta( $header->ID,
+				'_wp_attachment_custom_header_last_used_' . get_stylesheet(),
+				true );
+
+			$h = array(
+				'attachment_id' => $header->ID,
+				'url'           => $url,
+				'thumbnail_url' => $url,
+				'timestamp'     => $timestamp ? $timestamp : 0,
+			);
+
+			if ( isset( $header_data['width'] ) )
+				$h['width'] = $header_data['width'];
+			if ( isset( $header_data['height'] ) )
+				$h['height'] = $header_data['height'];
+
+			$header_images[] = $h;
+		}
+
+		return $header_images;
+	}
+
+	public function prepare_control() {
+	}
+	public function prepare_control_urgh() {
+		global $custom_image_header;
+		if ( empty( $custom_image_header ) )
+			return;
+
+		// Process default headers and uploaded headers.
+		$custom_image_header->process_default_headers();
+		$this->default_headers = $this->get_default_header_images();
+		$this->uploaded_headers = $this->get_uploaded_header_images();
+	}
+
+	function print_header_image_template() {
+		?>
+		<script type="text/template" id="tmpl-header-choice">
+			<% if (random) { %>
+
+			<div class="placeholder random">
+				<div class="inner">
+					<span><span class="dice">&#9860;</span>
+						<?php /* translators: "nImages" is a number, "type" is either "uploaded" or "suggested" */ ?>
+						<?php _e( 'Randomize <%- nImages %> <%- type %> headers' ); ?>
+					</span>
+				</div>
+			</div>
+
+			<% } else { %>
+
+			<a href="#" class="choice thumbnail %>"
+				data-customize-image-value="<%- header.url %>"
+				data-customize-header-image-data="<%- JSON.stringify(header) %>">
+				<img src="<%- header.thumbnail_url %>">
+			</a>
+
+			<% } %>
+		</script>
+
+		<script type="text/template" id="tmpl-header-current">
+			<% if (choice) { %>
+				<% if (random) { %>
+
+			<div class="placeholder">
+				<div class="inner">
+					<span><span class="dice">&#9860;</span>
+						<?php /* translators: "nImages" is a number, "type" is either "uploaded" or "suggested" */ ?>
+						<?php _e( 'Randomizing <%- nImages %> <%- type %> headers' ); ?>
+					</span>
+				</div>
+			</div>
+
+				<% } else { %>
+
+			<img src="<%- header.thumbnail_url %>" />
+
+				<% } %>
+			<% } else { %>
+
+			<div class="placeholder">
+				<div class="inner">
+					<span>
+						No image set.
+					</span>
+				</div>
+			</div>
+
+			<% } %>
+		</script>
+		<?php
+	}
+
+	public function get_current_image_src() {
+		$src = $this->value();
+		if ( isset( $this->get_url ) ) {
+			$src = call_user_func( $this->get_url, $src );
+			return $src;
+		}
+		return null;
+	}
+
+	public function render_content() {
+		$this->prepare_control();
+		$this->print_header_image_template();
+		$visibility = $this->get_current_image_src() ? '' : ' style="display:none" ';
+		$width = absint( get_theme_support( 'custom-header', 'width' ) );
+		$height = absint( get_theme_support( 'custom-header', 'height' ) );
+
+
+		// Remove domains from l10n
+		?>
+
+
+		<div class="customize-control-content">
+			<p class="customizer-section-intro">
+				<?php _e( 'Personalize your blog with your own header image.' ); ?>
+				<?php
+				if ( $width && $height ) {
+					printf( __( 'While you can crop images to your liking after clicking <strong>%s</strong>, your theme recommends a header size of <strong>%dx%d</strong> pixels.' ),
+						_x( 'Add new', 'new image', 'custom-header' ), $width, $height );
+				} else {
+					if ( $width )
+						printf( __( 'While you can crop images to your liking after clicking <strong>%s</strong>, your theme recommends a header width of <strong>%d</strong> pixels.' ),
+							_x( 'Add new', 'new image', 'custom-header' ), $width );
+					if ( $height )
+						printf( __( 'While you can crop images to your liking after clicking <strong>%s</strong>, your theme recommends a header height of <strong>%d</strong> pixels.' ),
+							_x( 'Add new', 'new image', 'custom-header' ), $height );
+				}
+				?>
+			</p>
+			<div class="current">
+				<span class="customize-control-title">
+					<?php _e( 'Current header', 'custom-header' ); ?>
+				</span>
+				<div class="container">
+				</div>
+			</div>
+			<div class="actions">
+<?php if ( false ) : ?>
+				<?php /* translators: Edit as in edit current header image via the Customizer */ ?>
+				<a href="#" <?php echo $visibility ?> class="button edit"><?php _e( 'Edit', 'custom-header' ); ?></a>
+<?php endif ?>
+				<?php /* translators: Hide as in hide header image via the Customizer */ ?>
+				<a href="#" <?php echo $visibility ?> class="button remove"><?php _e( 'Hide', 'custom-header' ); ?></a>
+				<?php /* translators: New as in add new header image via the Customizer */ ?>
+				<a href="#" class="button new"><?php _ex( 'Add new', 'new image', 'custom-header' ); ?></a>
+				<div style="clear:both"></div>
+			</div>
+			<div class="choices">
+				<span class="customize-control-title header-previously-uploaded">
+					<?php _e( 'Previously uploaded', 'custom-header' ); ?>
+				</span>
+				<div class="uploaded">
+					<div class="list">
+					</div>
+				</div>
+				<span class="customize-control-title header-default">
+					<?php _e( 'Suggested', 'custom-header' ); ?>
+				</span>
+				<div class="default">
+					<div class="list">
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
+}
+
 /**
  * Customize Header Image Control Class
  *
