@@ -267,8 +267,7 @@ window.wp = window.wp || {};
 		render: function( scope ) {
 			$( '.wp-view-wrap', scope ).each( function() {
 				var wrapper = $(this),
-					view = wp.mce.view.instance( this ),
-					$shortcode;
+					view = wp.mce.view.instance( this );
 
 				if ( ! view ) {
 					return;
@@ -281,18 +280,11 @@ window.wp = window.wp || {};
 				// Detach the view element to ensure events are not unbound.
 				view.$el.detach();
 
-				$shortcode = $( '<div />' )
-					.addClass( 'wp-view-shortcode' )
-					.prop( 'contenteditable', 'true' )
-					.data( 'mce-bogus', '1' )
-					.text( view.options.shortcode.string() );
-
 				// Empty the wrapper, attach the view element to the wrapper,
 				// add a hidden element with the shortcode,
 				// and add an ending marker to the wrapper to help regexes
 				// scan the HTML string.
 				wrapper.empty().append( view.el )
-					.prepend( $shortcode )
 					.append('<span data-wp-view-end class="wp-view-end"></span>');
 			});
 		},
@@ -346,7 +338,9 @@ window.wp = window.wp || {};
 		// Accepts a MCE view wrapper `node` (i.e. a node with the
 		// `wp-view-wrap` class).
 		select: function( node ) {
-			var $node = $(node);
+			var $node = $(node),
+				$shortcode,
+				view;
 
 			// Bail if node is already selected.
 			if ( $node.hasClass('selected') ) {
@@ -354,6 +348,17 @@ window.wp = window.wp || {};
 			}
 
 			$node.addClass('selected');
+
+			view = wp.mce.view.instance( node );
+
+			$shortcode = $( '<div />' )
+				.addClass( 'wp-view-shortcode' )
+				.prop( 'contenteditable', 'true' )
+				.data( 'mce-bogus', '1' )
+				.text( view.options.shortcode.string() );
+			
+			$node.prepend( $shortcode );
+
 			$( node.firstChild ).trigger('select');
 		},
 
@@ -370,6 +375,8 @@ window.wp = window.wp || {};
 			}
 
 			$node.removeClass('selected');
+
+			$node.find( '.wp-view-shortcode' ).remove();
 			$( node.firstChild ).trigger('deselect');
 		}
 	};

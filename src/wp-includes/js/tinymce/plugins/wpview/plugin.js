@@ -31,6 +31,8 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		deselect();
 		selected = view;
 
+		wp.mce.view.select( selected );
+
 		elem = editor.dom.select( '.wp-view-shortcode', view )[0];
 
 		// the following are both necessary to avoid tinymce from manipulating the selection/focus
@@ -44,7 +46,6 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		// select a the hidden div
 		editor.selection.select( elem, true );
 		elem.focus();
-		wp.mce.view.select( selected );
 	}
 
 	function deselect() {
