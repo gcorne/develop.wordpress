@@ -5,7 +5,7 @@
 tinymce.PluginManager.add( 'wpview', function( editor ) {
 	var VK = tinymce.util.VK,
 		TreeWalker = tinymce.dom.TreeWalker,
-		removeSelected = false,
+		toRemove = false,
 		selected;
 
 	function getParentView( node ) {
@@ -73,6 +73,12 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		// Add elements so we can set `contenteditable` to false.
 		// TODO: since we are serializing, is this needed?
 		editor.schema.addValidElements('div[*],span[*]');
+	});
+
+	editor.on( 'BeforeAddUndo', function( event ) {
+		if ( selected && ! toRemove ) {
+			event.preventDefault();
+		}
 	});
 
 	// When the editor's content changes, scan the new content for
@@ -188,7 +194,7 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		// Also, let any of the F# keys through.
 		if ( event.metaKey || event.ctrlKey || ( keyCode >= 112 && keyCode <= 123 ) ) {
 			if ( ( event.metaKey || event.ctrlKey ) && keyCode === 88 ) {
-				removeSelected = true;
+				toRemove = selected;
 			}
 			return;
 		}
@@ -215,11 +221,10 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 	editor.on( 'keyup', function() {
 		var instance;
 
-		if ( selected && removeSelected ) {
-			instance = wp.mce.view.instance( selected );
-			removeSelected = false;
+		if ( toRemove ) {
+			instance = wp.mce.view.instance( toRemove );
 			instance.remove();
-			deselect();
+			toRemove = false;
 		}
 
 	});
