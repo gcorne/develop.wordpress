@@ -876,7 +876,8 @@
 	api.controlConstructor = {
 		color:  api.ColorControl,
 		upload: api.UploadControl,
-		image:  api.ImageControl
+		image:  api.ImageControl,
+		header: api.HeaderControl
 	};
 
 	$( function() {
