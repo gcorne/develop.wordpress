@@ -482,7 +482,7 @@
 				header: data,
 				choice: url.split('/').pop()
 			});
-			UploadsList.add(choice);
+			api.HeaderTool.UploadsList.add(choice);
 			api.HeaderTool.currentHeader.set(choice.toJSON());
 			choice.save();
 			choice.importImage();
@@ -490,7 +490,7 @@
 
 		removeImage: function() {
 			api.HeaderTool.currentHeader.trigger('remove');
-			CombinedList.trigger('control:removeImage');
+			api.HeaderTool.CombinedList.trigger('control:removeImage');
 			Backbone.trigger('custom-header:stat', 'header-removed');
 		}
 
