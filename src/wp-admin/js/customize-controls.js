@@ -306,6 +306,196 @@
 		}
 	});
 
+	api.HeaderControl = api.Control.extend({
+		ready: function() {
+			this.btnEdit          = $('.actions .edit');
+			this.btnRemove        = $('.actions .remove');
+			this.btnNew           = $('.actions .new');
+
+			_.bindAll(this, 'openMM', 'removeImage');
+
+			// Hide for now, until we implement it
+			this.btnEdit.hide();
+
+			this.btnNew.on( 'click', this.openMM );
+			this.btnRemove.on( 'click', this.removeImage );
+
+			api.HeaderTool.currentHeader = new api.HeaderTool.ImageModel();
+
+			new api.HeaderTool.CurrentView({
+				model: api.HeaderTool.currentHeader,
+				el: '.current .container'
+			});
+
+			new api.HeaderTool.ChoiceListView({
+				collection: api.HeaderTool.UploadsList = new api.HeaderTool.ChoiceList(),
+				el: '.choices .uploaded .list'
+			});
+
+			new api.HeaderTool.ChoiceListView({
+				collection: api.HeaderTool.DefaultsList = new api.HeaderTool.DefaultsList(),
+				el: '.choices .default .list'
+			});
+
+			api.HeaderTool.combinedList = api.HeaderTool.CombinedList = new api.HeaderTool.CombinedList([
+				api.HeaderTool.UploadsList,
+				api.HeaderTool.DefaultsList
+			]);
+		},
+
+		calculateImageSelectOptions: function(attachment, controller) {
+			var xInit = parseInt(customHeaderVars.width, 10),
+					yInit = parseInt(customHeaderVars.height, 10),
+					flexWidth = !! parseInt(customHeaderVars['flex-width'], 10),
+					flexHeight = !! parseInt(customHeaderVars['flex-height'], 10),
+					ratio, xImg, yImg, realHeight, realWidth,
+					imgSelectOptions;
+
+			realWidth = attachment.get('width');
+			realHeight = attachment.get('height');
+
+			this.headerImage = new api.HeaderTool.ImageModel();
+			this.headerImage.set({
+				themeWidth: xInit,
+				themeHeight: yInit,
+				themeFlexWidth: flexWidth,
+				themeFlexHeight: flexHeight,
+				imageWidth: realWidth,
+				imageHeight: realHeight
+			});
+
+			controller.set( 'canSkipCrop', ! this.headerImage.shouldBeCropped() );
+
+			ratio = xInit / yInit;
+			xImg = realWidth;
+			yImg = realHeight;
+
+			if ( xImg / yImg > ratio ) {
+				yInit = yImg;
+				xInit = yInit * ratio;
+			} else {
+				xInit = xImg;
+				yInit = xInit / ratio;
+			}
+
+			imgSelectOptions = {
+				handles: true,
+				keys: true,
+				instance: true,
+				persistent: true,
+				parent: this.$el,
+				imageWidth: realWidth,
+				imageHeight: realHeight,
+				x1: 0,
+				y1: 0,
+				x2: xInit,
+				y2: yInit
+			};
+
+
+			if (flexHeight === false && flexWidth === false)
+			{
+				imgSelectOptions.aspectRatio = xInit + ':' + yInit;
+			}
+			if (flexHeight === false )
+			{
+				imgSelectOptions.maxHeight = yInit;
+			}
+			if (flexWidth === false )
+			{
+				imgSelectOptions.maxWidth = xInit;
+			}
+
+			return imgSelectOptions;
+		},
+		openMM: function(event) {
+			var title, suggestedWidth, suggestedHeight,
+					l10n = _wpMediaViewsL10n;
+
+			event.preventDefault();
+
+			suggestedWidth = l10n.suggestedWidth.replace('%d', customHeaderVars.width);
+			suggestedHeight = l10n.suggestedHeight.replace('%d', customHeaderVars.height);
+
+			title = {
+				html: l10n.chooseImage + ' <span class="suggested-dimensions">' +
+							suggestedWidth + ' ' + suggestedHeight +'</span>',
+				text: l10n.chooseImage
+			};
+
+			frame = wp.media({
+				title: title,
+				library: {
+					type: 'image'
+				},
+				button: {
+					text: l10n.selectAndCrop,
+					close: false
+				},
+				multiple: false,
+				imgSelectOptions: this.calculateImageSelectOptions
+			});
+
+			frame.states.add([new wp.media.controller.Cropper()]);
+
+			frame.on( 'select', function() {
+				frame.setState('cropper');
+			});
+
+			frame.on( 'cropped', function(croppedImage) {
+				var url = croppedImage.post_content,
+					attachmentId = croppedImage.attachment_id,
+					w = croppedImage.width,
+					h = croppedImage.height;
+				this.setImageFromURL(url, attachmentId, w, h);
+				Backbone.trigger('custom-header:stat', 'cropped-image');
+			}, this);
+
+			frame.on('skippedcrop', function(selection) {
+				var url = selection.get('url'),
+					w = selection.get('width'),
+					h = selection.get('height');
+				this.setImageFromURL(url, selection.id, w, h);
+				Backbone.trigger('custom-header:stat', 'skipped-cropping');
+			}, this);
+
+			frame.open();
+		},
+
+		setImageFromURL: function(url, attachmentId, width, height) {
+			var choice, data = {};
+
+			data.url = url;
+			data.thumbnail_url = url;
+			delete data.choice;
+
+			if (attachmentId)
+				data.attachment_id = attachmentId;
+
+			if (width)
+				data.width = width;
+
+			if (height)
+				data.height = height;
+
+			choice = new api.HeaderTool.ImageModel({
+				header: data,
+				choice: url.split('/').pop()
+			});
+			UploadsList.add(choice);
+			api.HeaderTool.currentHeader.set(choice.toJSON());
+			choice.save();
+			choice.importImage();
+		},
+
+		removeImage: function() {
+			api.HeaderTool.currentHeader.trigger('remove');
+			CombinedList.trigger('control:removeImage');
+			Backbone.trigger('custom-header:stat', 'header-removed');
+		}
+
+	});
+
 	// Change objects contained within the main customize object to Settings.
 	api.defaultConstructor = api.Setting;
 
@@ -686,7 +876,8 @@
 	api.controlConstructor = {
 		color:  api.ColorControl,
 		upload: api.UploadControl,
-		image:  api.ImageControl
+		image:  api.ImageControl,
+		header: api.HeaderControl
 	};
 
 	$( function() {
@@ -959,35 +1150,6 @@
 			control.setting.bind( function( to ) {
 				control.element.set( 'blank' !== to );
 			});
-		});
-
-		// Handle header image data
-		api.control( 'header_image', function( control ) {
-			control.setting.bind( function( to ) {
-				if ( to === control.params.removed )
-					control.settings.data.set( false );
-			});
-
-			control.library.on( 'click', 'a', function() {
-				control.settings.data.set( $(this).data('customizeHeaderImageData') );
-			});
-
-			control.uploader.success = function( attachment ) {
-				var data;
-
-				api.ImageControl.prototype.success.call( control, attachment );
-
-				data = {
-					attachment_id: attachment.get('id'),
-					url:           attachment.get('url'),
-					thumbnail_url: attachment.get('url'),
-					height:        attachment.get('height'),
-					width:         attachment.get('width')
-				};
-
-				attachment.element.data( 'customizeHeaderImageData', data );
-				control.settings.data.set( data );
-			};
 		});
 
 		api.trigger( 'ready' );
