@@ -1152,35 +1152,6 @@
 			});
 		});
 
-		// Handle header image data
-		api.control( 'header_image', function( control ) {
-			control.setting.bind( function( to ) {
-				if ( to === control.params.removed )
-					control.settings.data.set( false );
-			});
-
-			control.library.on( 'click', 'a', function() {
-				control.settings.data.set( $(this).data('customizeHeaderImageData') );
-			});
-
-			control.uploader.success = function( attachment ) {
-				var data;
-
-				api.ImageControl.prototype.success.call( control, attachment );
-
-				data = {
-					attachment_id: attachment.get('id'),
-					url:           attachment.get('url'),
-					thumbnail_url: attachment.get('url'),
-					height:        attachment.get('height'),
-					width:         attachment.get('width')
-				};
-
-				attachment.element.data( 'customizeHeaderImageData', data );
-				control.settings.data.set( data );
-			};
-		});
-
 		api.trigger( 'ready' );
 
 		// Make sure left column gets focus
