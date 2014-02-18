@@ -64,6 +64,25 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		selected = null;
 	}
 
+	function refreshEmptyContentNode() {
+		var body = editor.getBody(),
+			node,
+			editableNode;
+
+		// Gecko adds an editable node if there are no other editable elements
+		editableNode = editor.dom.select( '[_moz_editor_bogus_node="TRUE"]' );
+
+		if ( body.childNodes.length === ( 1 + editableNode.length ) ) {
+
+			node = body.childNodes[ body.childNodes.length - 1 ];
+
+			if ( node && isView( node ) ) {
+				editor.dom.add( body, 'p', {}, '<br data-mce-bogus="1">' );
+			}
+
+		}
+	}
+
 	// Check if the `wp.mce` API exists.
 	if ( typeof wp === 'undefined' || ! wp.mce ) {
 		return;
@@ -97,12 +116,14 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 	// processed, render the views in the document.
 	editor.on( 'SetContent', function() {
 		wp.mce.view.render( editor.getDoc() );
+		refreshEmptyContentNode();
 	});
 
 	// Provide our own handler for selecting a view that is picked up before TinyMCE
 	// Ideally, TinyMCE would provide a way to relinquish control over a block that is marked contenteditable=false perhaps through some sort of data attribute
 	editor.on( 'mousedown', function( event ) {
-		var view = getParentView( event.target );
+		var view = getParentView( event.target ),
+			x, y, firstView, emptyNode;
 
 		if ( event.metaKey || event.ctrlKey ) {
 			return;
@@ -118,6 +139,26 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 
 		} else {
 			deselect();
+
+			if ( event.target.nodeName === 'HTML' && isView( editor.getBody().firstChild ) ) {
+				firstView = editor.getBody().firstChild;
+
+				x = event.clientX;
+				y = event.clientY;
+
+				if ( x < firstView.offsetLeft || y < firstView.offsetTop ) {
+					// insert paragraph
+					emptyNode = editor.dom.create( 'p', {}, '<br data-mce-bogus="1">' );
+					editor.getBody().insertBefore( emptyNode, firstView );
+
+					editor.selection.select( editor.getBody().firstChild );
+					editor.selection.collapse( true );
+
+				}
+
+
+			}
+
 		}
 	} );
 
