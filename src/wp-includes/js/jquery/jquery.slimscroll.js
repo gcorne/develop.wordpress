@@ -2,7 +2,7 @@
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  *
- * Version: 1.3.1
+ * Version: 1.3.2
  *
  */
 (function($) {
@@ -144,7 +144,7 @@
         }
 
         // optionally set height to the parent's height
-        o.height = (o.height == 'auto') ? me.parent().height() : o.height;
+        o.height = (options.height == 'auto') ? me.parent().height() : options.height;
 
         // wrap content
         var wrapper = $(divS)
@@ -381,7 +381,6 @@
           {
             this.addEventListener('DOMMouseScroll', _onWheel, false );
             this.addEventListener('mousewheel', _onWheel, false );
-            //this.addEventListener('MozMousePixelScroll', _onWheel, false );
           }
           else
           {

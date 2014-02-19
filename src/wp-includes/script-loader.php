@@ -198,6 +198,7 @@ function wp_default_scripts( &$scripts ) {
 	$scripts->add( 'jquery-table-hotkeys', "/wp-includes/js/jquery/jquery.table-hotkeys$suffix.js", array('jquery', 'jquery-hotkeys'), false, 1 );
 	$scripts->add( 'jquery-touch-punch', "/wp-includes/js/jquery/jquery.ui.touch-punch.js", array('jquery-ui-widget', 'jquery-ui-mouse'), '0.2.2', 1 );
 	$scripts->add( 'jquery-masonry', "/wp-includes/js/jquery/jquery.masonry.min.js", array('jquery'), '2.1.05', 1 );
+	$scripts->add( 'jquery-slimscroll', "/wp-includes/js/jquery/jquery.slimscroll$suffix.js", array( 'jquery' ), '1.3.2', 1 );
 
 	$scripts->add( 'thickbox', "/wp-includes/js/thickbox/thickbox.js", array('jquery'), '3.1-20121105', 1 );
 	did_action( 'init' ) && $scripts->localize( 'thickbox', 'thickboxL10n', array(

@@ -716,13 +716,6 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 	public function enqueue() {
 		wp_enqueue_media();
 
-		// Move to wp-includes/js
-		wp_enqueue_script( 'slimscroll',
-			'/wp-includes/js/jquery/jquery.slimscroll.js',
-			array(),
-			'1.3.1',
-			true	);
-
 		// Where does this go? wp-includes/js?
 		wp_register_script( 'custom-header-models',
 			'/wp-admin/js/header-models.js',
@@ -733,11 +726,10 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 		// Where does this go? wp-includes/js?
 		wp_enqueue_script( 'custom-header-views',
 			'/wp-admin/js/header-views.js',
-			array( 'jquery', 'underscore', 'custom-header-models' ),
+			array( 'jquery', 'underscore', 'jquery-slimscroll', 'custom-header-models' ),
 			'20131028',
 			true	);
 		
-
 		wp_enqueue_script( 'imgareaselect' );
 		wp_enqueue_style( 'imgareaselect' );
 		
