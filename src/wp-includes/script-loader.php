@@ -376,6 +376,9 @@ function wp_default_scripts( &$scripts ) {
 		'allowedFiles' => __( 'Allowed Files' ),
 	) );
 
+	$scripts->add( 'customize-header-models',  "/wp-admin/js/header-models.js",  array( 'underscore', 'backbone' ), false, 1 );
+	$scripts->add( 'customize-header-views',  "/wp-admin/js/header-views.js",  array( 'jquery', 'underscore', 'jquery-slimscroll', 'imgareaselect', 'customize-header-models' ), false, 1 );
+
 	$scripts->add( 'accordion', "/wp-admin/js/accordion$suffix.js", array( 'jquery' ), false, 1 );
 
 	$scripts->add( 'shortcode', "/wp-includes/js/shortcode$suffix.js", array( 'underscore' ), false, 1 );
@@ -589,7 +592,7 @@ function wp_default_styles( &$styles ) {
 	$styles->add( 'wp-admin',           "/wp-admin/css/wp-admin$suffix.css", array( 'open-sans', 'dashicons' ) );
 	$styles->add( 'install',            "/wp-admin/css/install$suffix.css", array( 'buttons', 'open-sans' ) );
 	$styles->add( 'wp-color-picker',    "/wp-admin/css/color-picker$suffix.css" );
-	$styles->add( 'customize-controls', "/wp-admin/css/customize-controls$suffix.css", array( 'wp-admin', 'colors', 'ie' ) );
+	$styles->add( 'customize-controls', "/wp-admin/css/customize-controls$suffix.css", array( 'wp-admin', 'colors', 'ie', 'imgareaselect' ) );
 	$styles->add( 'ie',                 "/wp-admin/css/ie$suffix.css" );
 
 	$styles->add_data( 'ie', 'conditional', 'lte IE 7' );

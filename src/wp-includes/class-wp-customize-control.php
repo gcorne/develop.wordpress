@@ -716,25 +716,21 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 	public function enqueue() {
 		wp_enqueue_media();
 
-		// Where does this go? wp-includes/js?
-		wp_register_script( 'custom-header-models',
-			'/wp-admin/js/header-models.js',
-			array( 'underscore', 'backbone' ),
-			'20131114',
-			true	);
+		// which approach is better? wp_register_script or script-loader.php:$scripts->add?
 
-		// Where does this go? wp-includes/js?
-		wp_enqueue_script( 'custom-header-views',
-			'/wp-admin/js/header-views.js',
-			array( 'jquery', 'underscore', 'jquery-slimscroll', 'custom-header-models' ),
-			'20131028',
-			true	);
+		//wp_register_script( 'customize-header-models',
+		//	'/wp-admin/js/header-models.js',
+		//	array( 'underscore', 'backbone' ),
+		//	false,
+		//	true );
+
+		//wp_enqueue_script( 'customize-header-views',
+		//	'/wp-admin/js/header-views.js',
+		//	array( 'jquery', 'underscore', 'jquery-slimscroll', 'imgareaselect', 'customize-header-models' ),
+		//	false,
+		//	true );
 		
-		wp_enqueue_script( 'imgareaselect' );
-		wp_enqueue_style( 'imgareaselect' );
-		
-		// Where do we put the CSS?
-		wp_enqueue_style( 'custom-header-style', plugins_url( 'css/style.css', __FILE__ ) );
+		wp_enqueue_script( 'customize-header-views' );
 
 		$width = absint( get_theme_support( 'custom-header', 'width' ) );
 		$height = absint( get_theme_support( 'custom-header', 'height' ) );
@@ -742,7 +738,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 		$flex_width = absint( get_theme_support( 'custom-header', 'flex-width' ) );
 
 		// Needs an _
-		wp_localize_script( 'custom-header-views', 'customHeaderVars', array(
+		wp_localize_script( 'customize-header-views', 'customHeaderVars', array(
 			'width' => $width,
 			'height' => $height,
 			'flex-width' => $flex_width,
@@ -750,7 +746,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 			'currentImgSrc' => $this->get_current_image_src(),
 		) );
 
-		wp_localize_script( 'custom-header-views', '_wpCustomizeHeaderL10n', array(
+		wp_localize_script( 'customize-header-views', '_wpCustomizeHeaderL10n', array(
 			/* translators: header images uploaded by user */
 			'uploaded' => __( 'uploaded' ),
 			/* translators: header images suggested by the current theme */
@@ -758,8 +754,8 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 		) );
 		
 		$this->prepare_control_urgh();
-		wp_localize_script( 'custom-header-models', '_wpCustomizeHeaderUploads', $this->uploaded_headers );
-		wp_localize_script( 'custom-header-models', '_wpCustomizeHeaderDefaults', $this->default_headers );
+		wp_localize_script( 'customize-header-models', '_wpCustomizeHeaderUploads', $this->uploaded_headers );
+		wp_localize_script( 'customize-header-models', '_wpCustomizeHeaderDefaults', $this->default_headers );
 
 		parent::enqueue();
 
