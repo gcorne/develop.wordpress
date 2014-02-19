@@ -60,6 +60,10 @@ class Custom_Image_Header {
 	 */
 	var $page = '';
 
+	// Should these go here?
+	var $header_image;
+	var $parent_attachment_id;
+
 	/**
 	 * Constructor - Register administration header callback.
 	 *
@@ -71,6 +75,18 @@ class Custom_Image_Header {
 	function __construct($admin_header_callback, $admin_image_div_callback = '') {
 		$this->admin_header_callback = $admin_header_callback;
 		$this->admin_image_div_callback = $admin_image_div_callback;
+		
+		if ( current_theme_supports( 'custom-header' ) ) {
+			add_action( 'customize_save_after', array( $this, 'set_last_used' ) );
+			// Can this go in the control?
+			add_action( 'customize_controls_print_footer_scripts', array( $this, 'add_media_manager_templates' ) );
+			// Can we just do this with CSS selectors? or shove in control?
+			add_action( 'customize_controls_print_styles', array( $this, 'change_media_zindex' ) );
+			add_action( 'wp_ajax_header_crop', array( $this, 'ajax_header_crop' ) );
+			add_action( 'wp_ajax_header_add', array( $this, 'ajax_header_add' ) );
+			add_filter( 'wp_prepare_attachment_for_js', array( $this, 'add_parent_attachment_js' ) , 11, 3);
+			add_filter( 'wp_header_image_attachment_metadata', array( $this, 'add_parent_attachment_id' ) , 11, 1);
+		}
 
 		add_action( 'admin_menu', array( $this, 'init' ) );
 	}
@@ -93,6 +109,7 @@ class Custom_Image_Header {
 		add_action("admin_head-$page", array($this, 'js'), 50);
 		if ( $this->admin_header_callback )
 			add_action("admin_head-$page", $this->admin_header_callback, 51);
+
 	}
 
 	/**
@@ -1096,5 +1113,110 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		$metadata = apply_filters( 'wp_header_image_attachment_metadata', $metadata );
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 		return $attachment_id;
+	}
+	
+	function add_media_manager_templates() {
+		wp_print_media_templates();
+	}
+
+	function change_media_zindex() { ?>
+			<style>
+			.media-modal {
+					z-index: 1001000 !important;
+			}
+			</style>
+	<?php }
+
+	function ajax_check_nonce( $nonce, $attachment_id = null ) {
+		if ( ! isset( $nonce ) || ! wp_verify_nonce( $nonce,  'crop-image_' . $attachment_id ) ) {
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+		}
+	}
+
+	/**
+ 	 * Gets attachment uploaded by Media Manager, crops it, then saves it as a
+ 	 * new object. Returns JSON-encoded object details.
+ 	 */
+	function ajax_header_crop() {
+		$data = $_POST['data'];
+		$this->ajax_check_nonce( $data['nonces']['crop'], $data['id'] );
+		if ( ! current_theme_supports( 'custom-header', 'uploads' ) )
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+
+		if ( ! empty( $data['skip-cropping'] ) && ! ( current_theme_supports( 'custom-header', 'flex-height' ) || current_theme_supports( 'custom-header', 'flex-width' ) ) )
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+
+		$crop_details = $data['cropDetails'];
+
+		$dimensions = $this->get_header_dimensions( array(
+			'width' => $data['width'],
+			'height' => $data['height'],
+		) );
+
+		$attachment_id = absint( $data['id'] );
+
+		$cropped = wp_crop_image( $attachment_id, (int) $crop_details['x1'], (int) $crop_details['y1'], (int) $crop_details['width'], (int) $crop_details['height'], (int) $dimensions['dst_width'], (int) $dimensions['dst_height'] );
+
+		if ( ! $cropped || is_wp_error( $cropped ) )
+			wp_die( __( 'Image could not be processed. Please go back and try again.' ), __( 'Image Processing Error' ) );
+
+		$cropped = apply_filters( 'wp_create_file_in_uploads', $cropped, $attachment_id ); // For replication
+
+		$object = $this->create_attachment_object( $cropped, $attachment_id );
+
+		unset( $object['ID'] );
+		
+		$this->parent_attachment_id = $attachment_id;
+		$new_attachment_id = $this->insert_attachment( $object, $cropped );
+
+		$object['attachment_id'] = $new_attachment_id;
+		$object['width']         = $dimensions['dst_width'];
+		$object['height']        = $dimensions['dst_height'];
+
+		echo json_encode($object);
+		die();
+	}
+
+	/**
+	 * Given an attachment ID for a header image, updates its "last used"
+	 * timestamp to now.
+	 *
+	 * Should be triggered when the user tries adds a new header image from the
+	 * Media Manager, even if s/he doesn't save that change.
+ 	 */
+	function ajax_header_add() {
+		$data = $_POST['data'];
+		$attachment_id = absint( $data['attachment_id'] );
+		$this->ajax_check_nonce( $data['nonces']['add'], $attachment_id );
+
+		if ( $attachment_id < 1 )
+			return;
+
+		$key = '_wp_attachment_custom_header_last_used_' . get_stylesheet();
+		update_post_meta( $attachment_id, $key, time() );
+		update_post_meta( $attachment_id, '_wp_attachment_is_custom_header', get_stylesheet() );
+
+		die();
+	}
+
+	function set_last_used( $manager ) {
+		$data = $manager->get_setting( 'header_image_data' )->post_value();
+
+		if ( !isset( $data['attachment_id'] ) )
+			return;
+
+		$attachment_id = $data['attachment_id'];
+		$key = '_wp_attachment_custom_header_last_used_' . get_stylesheet();
+		update_post_meta( $attachment_id, $key, time() );
+	}
+
+	function add_parent_attachment_id( $metadata ) {
+		$metadata['parent_attachment_id'] = $this->parent_attachment_id;
+		return $metadata;
+	}
+
+	function add_parent_attachment_js($response, $attachment, $meta ){
+		$response['parentAttachmentId'] = isset( $meta['parent_attachment_id'] ) ? $meta['parent_attachment_id'] : 0;
+		return $response;
 	}
 }
