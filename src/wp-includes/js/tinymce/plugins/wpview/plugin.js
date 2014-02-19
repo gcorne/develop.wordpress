@@ -122,8 +122,7 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 	// Provide our own handler for selecting a view that is picked up before TinyMCE
 	// Ideally, TinyMCE would provide a way to relinquish control over a block that is marked contenteditable=false perhaps through some sort of data attribute
 	editor.on( 'mousedown', function( event ) {
-		var view = getParentView( event.target ),
-			x, y, firstView, emptyNode;
+		var view = getParentView( event.target );
 
 		if ( event.metaKey || event.ctrlKey ) {
 			return;
@@ -139,26 +138,53 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 
 		} else {
 			deselect();
+		}
+	} );
 
-			if ( event.target.nodeName === 'HTML' && isView( editor.getBody().firstChild ) ) {
-				firstView = editor.getBody().firstChild;
+	// Detect mouse down events that are adjacent to a view when a view is the first view or the last view
+	//
+	editor.on( 'click', function( event ) {
+		var body = editor.getBody(),
+			doc = editor.getDoc(),
+			scrollTop = body.scrollTop || doc.documentElement.scrollTop || 0,
+			x, y, firstView, lastView, emptyNode;
 
-				x = event.clientX;
-				y = event.clientY;
+		if ( event.metaKey || event.ctrlKey ) {
+			return;
+		}
 
-				if ( x < firstView.offsetLeft || y < firstView.offsetTop ) {
-					// insert paragraph
-					emptyNode = editor.dom.create( 'p', {}, '<br data-mce-bogus="1">' );
-					editor.getBody().insertBefore( emptyNode, firstView );
+		if ( event.target.nodeName === 'HTML' && ( isView( body.firstChild ) || isView( body.lastChild ) ) ) {
+			firstView = body.firstChild;
+			lastView = body.lastChild;
 
-					editor.selection.select( editor.getBody().firstChild );
-					editor.selection.collapse( true );
+			x = event.clientX;
+			y = event.clientY;
 
-				}
+			emptyNode = editor.dom.create( 'p', {}, '<br data-mce-bogus="1">' );
 
+			// detect events above or to the left of the first view
+			if ( isView( firstView ) && ( ( x < firstView.offsetLeft && y < ( firstView.offsetHeight - scrollTop ) ) ||
+						y < firstView.offsetTop ) ) {
 
+				body.insertBefore( emptyNode, firstView );
+				editor.selection.select( emptyNode.firstChild );
+				editor.selection.collapse( true );
+				editor.selection.scrollIntoView( emptyNode );
+
+				return false;
 			}
+			// detect events to the right and below the last view
+			else if ( isView( lastView ) && ( x > ( lastView.offsetLeft + lastView.offsetWidth ) ||
+				( ( scrollTop + y ) - ( lastView.offsetTop + lastView.offsetHeight ) ) > 0 ) ) {
 
+				body.appendChild( emptyNode );
+
+				editor.selection.select( body.lastChild );
+				editor.selection.collapse( true );
+				editor.selection.scrollIntoView( body.lastChild );
+
+				return false;
+			}
 		}
 	} );
 
