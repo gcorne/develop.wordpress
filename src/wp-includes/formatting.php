@@ -2899,23 +2899,24 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
 		return  '';
 	}
 
-	$unreserved = 'a-z0-9-~+_.';
-	$sub_delims = '!$&\'()*+,;=';
-
+	// not sure why we are including \x80 - \xa0, but also am not sure how well the byte sequences will work with
+	// UTF-8 characters since 
+	$allowed_chars = 'a-z0-9-~+_.!$&\'()*+,;=%\\x80-\\xff';
+	
 	foreach( $components as $component => $val ) {
 		$regex = false;
 
 		switch( $component ) {
 			case 'host':
-				$regex = '|[^' . $unreserved . $sub_delims . '%:\[\]\\x80-\\xff]|i';
+				$regex = '|[^' . $allowed_chars . '%:\[\]]|i';
 			break;
 			case 'path':
-				$regex = '|[^' . $unreserved . $sub_delims . '%/:@\\x80-\\xff]|i';
+				$regex = '|[^' . $allowed_chars .  '%/:@]|i';
 				break;
 			case 'query':
-				$regex = '|[^' . $unreserved . $sub_delims . '%/:@?\\x80-\\xff]|i';
+				$regex = '|[^' . $allowed_chars . '%/:@?|i';
 			case 'fragment':
-				$regex = '|[^' . $unreserved . $sub_delims . '%/:@?\\x80-\\xff]|i';
+				$regex = '|[^' . $allowed_chars . '%/:@?]|i';
 				break;
 			case 'scheme':
 			case 'port':
@@ -2927,7 +2928,6 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
 		if ( $regex ) {
 			$components[ $component ] = preg_replace( $regex, '', $components[ $component ] );
 		}
-
 	}
 
 	$url = '';
