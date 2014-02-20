@@ -1663,15 +1663,17 @@ function _make_web_ftp_clickable_cb($matches) {
 	$ret = '';
 	$dest = $matches[2];
 	$dest = 'http://' . $dest;
-	$dest = esc_url($dest);
-	if ( empty($dest) )
-		return $matches[0];
 
 	// removed trailing [.,;:)] from URL
 	if ( in_array( substr($dest, -1), array('.', ',', ';', ':', ')') ) === true ) {
 		$ret = substr($dest, -1);
 		$dest = substr($dest, 0, strlen($dest)-1);
 	}
+
+	$dest = esc_url($dest);
+	if ( empty($dest) )
+		return $matches[0];
+
 	return $matches[1] . "<a href=\"$dest\" rel=\"nofollow\">$dest</a>$ret";
 }
 
@@ -2855,6 +2857,8 @@ function esc_sql( $data ) {
  * (the default behaviour) ampersands are also replaced. The 'clean_url' filter
  * is applied to the returned cleaned URL.
  *
+ * See RFC3986
+ *
  * @since 2.8.0
  * @uses wp_kses_bad_protocol() To only permit protocols in the URL set
  *		via $protocols or the common ones set in the function.
@@ -2870,17 +2874,85 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
 
 	if ( '' == $url )
 		return $url;
-	$url = preg_replace('|[^a-z0-9-~+_.?#=!&;,/:%@$\|*\'()\\x80-\\xff]|i', '', $url);
-	$strip = array('%0d', '%0a', '%0D', '%0A');
-	$url = _deep_replace($strip, $url);
+
+
 	$url = str_replace(';//', '://', $url);
+
 	/* If the URL doesn't appear to contain a scheme, we
-	 * presume it needs http:// appended (unless a relative
+	 * presume it needs http:// prepended (unless a relative
 	 * link starting with /, # or ? or a php file).
 	 */
 	if ( strpos($url, ':') === false && ! in_array( $url[0], array( '/', '#', '?' ) ) &&
-		! preg_match('/^[a-z0-9-]+?\.php/i', $url) )
-		$url = 'http://' . $url;
+		! preg_match('/^[a-z0-9-]+?\.php/i', $url) ) {
+			$url = 'http://' . $url;
+	}
+
+	$strip = array('%0d', '%0a', '%0D', '%0A');
+	$url = _deep_replace($strip, $url);
+
+	$components = @parse_url( $url );
+
+	if ( $url[ strlen( $url ) - 1 ] === ':' ) {
+		var_dump( $components );
+	}
+	if ( ! $components ) {
+		return  '';
+	}
+
+	$unreserved = 'a-z0-9-~+_.';
+	$sub_delims = '!$&\'()*+,;=';
+
+	foreach( $components as $component => $val ) {
+		$regex = false;
+
+		switch( $component ) {
+			case 'host':
+				$regex = '|[^' . $unreserved . $sub_delims . '%:\[\]\\x80-\\xff]|i';
+			break;
+			case 'path':
+				$regex = '|[^' . $unreserved . $sub_delims . '%/:@\\x80-\\xff]|i';
+				break;
+			case 'query':
+				$regex = '|[^' . $unreserved . $sub_delims . '%/:@?\\x80-\\xff]|i';
+			case 'fragment':
+				$regex = '|[^' . $unreserved . $sub_delims . '%/:@?\\x80-\\xff]|i';
+				break;
+			case 'scheme':
+			case 'port':
+			case 'user':
+			case 'pass':
+				break;
+		}
+
+		if ( $regex ) {
+			$components[ $component ] = preg_replace( $regex, '', $components[ $component ] );
+		}
+
+	}
+
+	$url = '';
+
+	if ( isset( $components['scheme'] ) ) {
+		$url .= $components['scheme'] . ':';
+	}
+
+	if ( isset( $components['host'] ) )  {
+		$url .= '//' . $components['host'];
+	}
+
+	if ( isset( $components['path'] ) ) {
+		$url .= $components['path'];
+	}
+
+	if ( isset( $components['query'] ) ) {
+		$url .= '?' . $components['query'];
+	}
+
+	if ( isset( $components['fragment'] ) ) {
+		$url .= '#' . $components['fragment'];
+	} else if ( $original_url[ strlen( $original_url ) - 1 ] === '#' ) {
+		$url .= '#';
+	}
 
 	// Replace ampersands and single quotes only when displaying.
 	if ( 'display' == $_context ) {
