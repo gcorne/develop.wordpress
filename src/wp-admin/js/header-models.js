@@ -51,12 +51,12 @@
 			if (data.attachment_id === undefined)
 				return;
 
-			data.nonces = { add: _wpCustomizeHeader.data.nonce };
 			$.post(_wpCustomizeSettings.url.ajax, {
 				wp_customize: 'on',
 				theme: api.settings.theme.stylesheet,
 				dataType: 'json',
 				action: 'header_add',
+				nonce: _wpCustomizeHeader.nonces.add,
 				data: data
 			});
 		},

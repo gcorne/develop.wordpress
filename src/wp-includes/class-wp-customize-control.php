@@ -727,6 +727,9 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 				'flex-height' => absint( get_theme_support( 'custom-header', 'flex-height' ) ),
 				'currentImgSrc' => $this->get_current_image_src(),
 			),
+			'nonces' => array(
+				'add' => wp_create_nonce( 'header-add' ),
+			),
 			'l10n' => array(
 				/* translators: header images uploaded by user */
 				'uploaded' => __( 'uploaded' ),

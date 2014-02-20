@@ -1187,7 +1187,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	function ajax_header_add() {
 		$data = $_POST['data'];
 		$attachment_id = absint( $data['attachment_id'] );
-		$this->ajax_check_nonce( $data['nonces']['add'], $attachment_id );
+		check_ajax_referer( 'header-add', 'nonce' );
 
 		if ( $attachment_id < 1 )
 			return;
