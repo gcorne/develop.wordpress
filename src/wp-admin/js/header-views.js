@@ -171,9 +171,6 @@
 			this.toggleTitle();
 			if (this.$el.parents().hasClass('uploaded')) {
 				this.setMaxListHeight();
-				// Ideally, we'd add 10px to the parent container's width, but
-				// that width is being computed as 0; hence hardcoding:
-				this.$el.add(this.$el.parents('.slimScrollDiv')).width(269);
 			}
 		},
 
