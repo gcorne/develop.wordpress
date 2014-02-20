@@ -2892,9 +2892,6 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
 
 	$components = @parse_url( $url );
 
-	if ( $url[ strlen( $url ) - 1 ] === ':' ) {
-		var_dump( $components );
-	}
 	if ( ! $components ) {
 		return  '';
 	}
