@@ -73,8 +73,11 @@
 	api.HeaderTool.ChoiceView = Backbone.View.extend({
 		template: _.template($('#tmpl-header-choice').html()),
 
+		className: 'header-view',
+
 		events: {
-			'click': 'select'
+			'click .choice,.random': 'select',
+			'click .close': 'removeImage'
 		},
 
 		initialize: function() {
@@ -89,14 +92,16 @@
 		},
 
 		render: function() {
+			var model = this.model;
+
 			this.$el.html(this.template(this.extendedModel()));
 
-			if (this.model.get('random'))
+			if (model.get('random'))
 				this.setPlaceholder(40);
 			else
 				lastHeight = this.getHeight();
 
-			this.$el.toggleClass('hidden', this.model.get('hidden'));
+			this.$el.toggleClass('hidden', model.get('hidden'));
 			return this;
 		},
 
@@ -119,6 +124,12 @@
 			this.model.save();
 			api.HeaderTool.currentHeader.set(this.extendedModel());
 			this.sendStats();
+		},
+
+		removeImage: function(e) {
+			e.stopPropagation();
+			this.model.destroy();
+			this.remove();
 		},
 
 		sendStats: function() {
@@ -147,6 +158,7 @@
 
 		initialize: function() {
 			this.listenTo(this.collection, 'add', this.addOne);
+			this.listenTo(this.collection, 'remove', this.render);
 			this.listenTo(this.collection, 'sort', this.render);
 			this.listenTo(this.collection, 'change:hidden', this.toggleTitle);
 			this.listenTo(this.collection, 'change:hidden', this.setMaxListHeight);
@@ -159,6 +171,9 @@
 			this.toggleTitle();
 			if (this.$el.parents().hasClass('uploaded')) {
 				this.setMaxListHeight();
+				// Ideally, we'd add 10px to the parent container's width, but
+				// that width is being computed as 0; hence hardcoding:
+				this.$el.add(this.$el.parents('.slimScrollDiv')).width(269);
 			}
 		},
 

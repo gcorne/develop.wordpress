@@ -489,7 +489,7 @@
 		},
 
 		removeImage: function() {
-			api.HeaderTool.currentHeader.trigger('remove');
+			api.HeaderTool.currentHeader.trigger('hide');
 			api.HeaderTool.CombinedList.trigger('control:removeImage');
 			Backbone.trigger('custom-header:stat', 'header-removed');
 		}

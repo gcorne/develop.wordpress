@@ -84,6 +84,7 @@ class Custom_Image_Header {
 			add_action( 'customize_controls_print_styles', array( $this, 'change_media_zindex' ) );
 			add_action( 'wp_ajax_header_crop', array( $this, 'ajax_header_crop' ) );
 			add_action( 'wp_ajax_header_add', array( $this, 'ajax_header_add' ) );
+			add_action( 'wp_ajax_header_remove', array( __CLASS__, 'ajax_header_remove' ) );
 			add_filter( 'wp_prepare_attachment_for_js', array( $this, 'add_parent_attachment_js' ) , 11, 3);
 			add_filter( 'wp_header_image_attachment_metadata', array( $this, 'add_parent_attachment_id' ) , 11, 1);
 		}
@@ -1186,9 +1187,9 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
  	 */
 	function ajax_header_add() {
 		$data = $_POST['data'];
-		$attachment_id = absint( $data['attachment_id'] );
 		check_ajax_referer( 'header-add', 'nonce' );
 
+		$attachment_id = absint( $data['attachment_id'] );
 		if ( $attachment_id < 1 )
 			return;
 
@@ -1198,6 +1199,22 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 
 		die();
 	}
+
+	function ajax_header_remove() {
+		$data = $_POST['data'];
+		check_ajax_referer( 'header-remove', 'nonce' );
+
+		$attachment_id = absint( $data['attachment_id'] );
+		if ( $attachment_id < 1 )
+			return;
+
+		$key = '_wp_attachment_custom_header_last_used_' . get_stylesheet();
+		delete_post_meta( $attachment_id, $key );
+		delete_post_meta( $attachment_id, '_wp_attachment_is_custom_header', get_stylesheet() );
+
+		die();
+	}
+
 
 	function set_last_used( $manager ) {
 		$data = $manager->get_setting( 'header_image_data' )->post_value();

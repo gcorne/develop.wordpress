@@ -493,6 +493,33 @@ body:not(.blue) #customize-control-header_image .inner {
 	color: #eee;
 }
 
+
+/* Overlay "close" button */
+
+#customize-control-header_image .header-view {
+	position: relative;
+}
+
+#customize-control-header_image .uploaded .header-view .close {
+	visibility: hidden;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 1;
+	width: 20px;
+	height: 20px;
+	background: url('../images/close-button.light.png');
+	background-size: 20px 20px;
+	text-indent: -999px;
+}
+
+#customize-control-header_image .header-view:hover .close {
+	visibility: visible;
+}
+
+
+/* Randomiz(s)er */
+
 #customize-control-header_image .random.placeholder {
 	cursor: pointer;
 	border-radius: 2px;

@@ -729,6 +729,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 			),
 			'nonces' => array(
 				'add' => wp_create_nonce( 'header-add' ),
+				'remove' => wp_create_nonce( 'header-remove' ),
 			),
 			'l10n' => array(
 				/* translators: header images uploaded by user */
@@ -881,6 +882,10 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 
 			<% } else { %>
 
+			<% if (type == 'uploaded') { %>
+			<a href="#" class="close">X</a>
+			<% } %>
+
 			<a href="#" class="choice thumbnail %>"
 				data-customize-image-value="<%- header.url %>"
 				data-customize-header-image-data="<%- JSON.stringify(header) %>">
@@ -938,9 +943,6 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 		$visibility = $this->get_current_image_src() ? '' : ' style="display:none" ';
 		$width = absint( get_theme_support( 'custom-header', 'width' ) );
 		$height = absint( get_theme_support( 'custom-header', 'height' ) );
-
-
-		// Remove domains from l10n
 		?>
 
 

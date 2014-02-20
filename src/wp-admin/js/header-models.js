@@ -20,13 +20,34 @@
 		},
 
 		initialize: function() {
-			this.on('remove', this.remove, this);
+			this.on('hide', this.hide, this);
 		},
 
-		remove: function() {
+		hide: function() {
 			this.set('choice', '');
 			api('header_image').set('remove-header');
 			api('header_image_data').set('remove-header');
+		},
+
+		destroy: function() {
+			var data = this.get('header'),
+				curr = api.HeaderTool.currentHeader.get('header').attachment_id;
+
+			// If the image we're removing is also the current header, unset
+			// the latter
+			if (curr && data.attachment_id == curr)
+				api.HeaderTool.currentHeader.trigger('hide');
+
+			$.post(_wpCustomizeSettings.url.ajax, {
+				wp_customize: 'on',
+				theme: api.settings.theme.stylesheet,
+				dataType: 'json',
+				action: 'header_remove',
+				nonce: _wpCustomizeHeader.nonces.remove,
+				data: data
+			});
+
+			this.trigger('destroy', this, this.collection);
 		},
 
 		save: function() {
