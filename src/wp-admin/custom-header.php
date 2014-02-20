@@ -1051,7 +1051,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 			$max_width = max( $max_width, get_theme_support( 'custom-header', 'max-width' ) );
 		$max_width = max( $max_width, $theme_width );
 
-		if ( $has_flex_height && ( ! $has_flex_width || $max_width > $max_width ) )
+		if ( $has_flex_height && ( ! $has_flex_width || $width > $max_width ) )
 			$dst['dst_height'] = absint( $height * ( $max_width / $width ) );
 		elseif ( $has_flex_height && $has_flex_width )
 			$dst['dst_height'] = $height;
@@ -1150,8 +1150,8 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		$crop_details = $data['cropDetails'];
 
 		$dimensions = $this->get_header_dimensions( array(
-			'width' => $data['width'],
-			'height' => $data['height'],
+			'width' => $crop_details['width'],
+			'height' => $crop_details['height'],
 		) );
 
 		$attachment_id = absint( $data['id'] );
