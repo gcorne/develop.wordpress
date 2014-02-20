@@ -1,5 +1,6 @@
 window.wp = { customize: { get: function(){} } };
 window.api = wp.customize;
+window._wpCustomizeHeader = {};
 window._wpCustomizeHeader.uploads = {
 	"cropped-abstract_00601126.jpg": {
 		"attachment_id": 1,
