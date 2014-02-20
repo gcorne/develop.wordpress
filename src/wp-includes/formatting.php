@@ -2902,17 +2902,21 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
 	
 	foreach( $components as $component => $val ) {
 		$regex = false;
+		$encode_brackets = false;
 
 		switch( $component ) {
 			case 'host':
 				$regex = '|[^' . $allowed_chars . '%:\[\]]|i';
 			break;
 			case 'path':
+				$encode_brackets = true;
 				$regex = '|[^' . $allowed_chars .  '%/:@]|i';
 				break;
 			case 'query':
+				$encode_brackets = true;
 				$regex = '|[^' . $allowed_chars . '%/:@?|i';
 			case 'fragment':
+				$encode_brackets = true;
 				$regex = '|[^' . $allowed_chars . '%/:@?]|i';
 				break;
 			case 'scheme':
@@ -2922,9 +2926,15 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
 				break;
 		}
 
+		if ( $encode_brackets ) {
+			$components[ $component ] = str_replace( '[', '%5B', $components[ $component ] );
+			$components[ $component ] = str_replace( ']', '%5D', $components[ $component ] );
+		}
+
 		if ( $regex ) {
 			$components[ $component ] = preg_replace( $regex, '', $components[ $component ] );
 		}
+
 	}
 
 	$url = '';
