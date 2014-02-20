@@ -716,20 +716,6 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 	public function enqueue() {
 		wp_enqueue_media();
 
-		// which approach is better? wp_register_script or script-loader.php:$scripts->add?
-
-		//wp_register_script( 'customize-header-models',
-		//	'/wp-admin/js/header-models.js',
-		//	array( 'underscore', 'backbone' ),
-		//	false,
-		//	true );
-
-		//wp_enqueue_script( 'customize-header-views',
-		//	'/wp-admin/js/header-views.js',
-		//	array( 'jquery', 'underscore', 'jquery-slimscroll', 'imgareaselect', 'customize-header-models' ),
-		//	false,
-		//	true );
-		
 		wp_enqueue_script( 'customize-header-views' );
 
 		$width = absint( get_theme_support( 'custom-header', 'width' ) );
@@ -738,7 +724,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 		$flex_width = absint( get_theme_support( 'custom-header', 'flex-width' ) );
 
 		// Needs an _
-		wp_localize_script( 'customize-header-views', 'customHeaderVars', array(
+		wp_localize_script( 'customize-header-views', '_wpCustomizeHeaderVars', array(
 			'width' => $width,
 			'height' => $height,
 			'flex-width' => $flex_width,
