@@ -715,36 +715,29 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 
 	public function enqueue() {
 		wp_enqueue_media();
-
 		wp_enqueue_script( 'customize-header-views' );
 
-		$width = absint( get_theme_support( 'custom-header', 'width' ) );
-		$height = absint( get_theme_support( 'custom-header', 'height' ) );
-		$flex_height = absint( get_theme_support( 'custom-header', 'flex-height' ) );
-		$flex_width = absint( get_theme_support( 'custom-header', 'flex-width' ) );
-
-		// Needs an _
-		wp_localize_script( 'customize-header-views', '_wpCustomizeHeaderVars', array(
-			'width' => $width,
-			'height' => $height,
-			'flex-width' => $flex_width,
-			'flex-height' => $flex_height,
-			'currentImgSrc' => $this->get_current_image_src(),
-		) );
-
-		wp_localize_script( 'customize-header-views', '_wpCustomizeHeaderL10n', array(
-			/* translators: header images uploaded by user */
-			'uploaded' => __( 'uploaded' ),
-			/* translators: header images suggested by the current theme */
-			'default' => __( 'suggested' )
-		) );
-		
 		$this->prepare_control_urgh();
-		wp_localize_script( 'customize-header-models', '_wpCustomizeHeaderUploads', $this->uploaded_headers );
-		wp_localize_script( 'customize-header-models', '_wpCustomizeHeaderDefaults', $this->default_headers );
+
+		wp_localize_script( 'customize-header-views', '_wpCustomizeHeader', array(
+			'data' => array(
+				'width' => absint( get_theme_support( 'custom-header', 'width' ) ),
+				'height' => absint( get_theme_support( 'custom-header', 'height' ) ),
+				'flex-width' => absint( get_theme_support( 'custom-header', 'flex-width' ) ),
+				'flex-height' => absint( get_theme_support( 'custom-header', 'flex-height' ) ),
+				'currentImgSrc' => $this->get_current_image_src(),
+			),
+			'l10n' => array(
+				/* translators: header images uploaded by user */
+				'uploaded' => __( 'uploaded' ),
+				/* translators: header images suggested by the current theme */
+				'default' => __( 'suggested' )
+			),
+			'uploads' => $this->uploaded_headers,
+			'defaults' => $this->default_headers
+		) );
 
 		parent::enqueue();
-
 	}
 
 	public function get_default_header_images() {

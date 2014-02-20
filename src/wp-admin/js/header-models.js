@@ -1,4 +1,4 @@
-/* globals jQuery, _wpCustomizeHeaderVars, _wpCustomizeHeaderUploads, _wpCustomizeHeaderDefaults */
+/* globals jQuery, _wpCustomizeHeader */
 ;( function( $, wp ) {
 	var api = wp.customize;
 	api.HeaderTool = {};
@@ -51,7 +51,7 @@
 			if (data.attachment_id === undefined)
 				return;
 
-			data.nonces = { add: _wpCustomizeHeaderVars.nonce };
+			data.nonces = { add: _wpCustomizeHeader.data.nonce };
 			$.post(_wpCustomizeSettings.url.ajax, {
 				wp_customize: 'on',
 				theme: api.settings.theme.stylesheet,
@@ -105,7 +105,7 @@
 				this.type = 'uploaded';
 
 			if (!this.data)
-				this.data = _wpCustomizeHeaderUploads;
+				this.data = _wpCustomizeHeader.uploads;
 
 			if (isRandom) {
 				// So that when adding data we don't hide regular images
@@ -195,7 +195,7 @@
 	api.HeaderTool.DefaultsList = api.HeaderTool.ChoiceList.extend({
 		initialize: function() {
 			this.type = 'default';
-			this.data = _wpCustomizeHeaderDefaults;
+			this.data = _wpCustomizeHeader.defaults;
 			api.HeaderTool.ChoiceList.prototype.initialize.apply(this);
 		}
 	});

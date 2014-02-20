@@ -1,4 +1,4 @@
-/* globals jQuery, _, Backbone, _wpMediaViewsL10n, _wpCustomizeHeaderL10n */
+/* globals jQuery, _, Backbone, _wpMediaViewsL10n, _wpCustomizeHeader */
 ;( function( $, wp, _ ) {
 	if ( ! wp || ! wp.customize ) { return; }
 	var api = wp.customize, frame, CombinedList, UploadsList, DefaultsList;
@@ -102,7 +102,7 @@
 
 		extendedModel: function() {
 			var c = this.model.get('collection'),
-				t = _wpCustomizeHeaderL10n[c.type] || '';
+				t = _wpCustomizeHeader.l10n[c.type] || '';
 
 			return _.extend(this.model.toJSON(), {
 				// -1 to exclude the randomize button

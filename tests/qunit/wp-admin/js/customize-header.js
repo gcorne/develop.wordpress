@@ -11,7 +11,7 @@ jQuery( function() {
 		}
 	});
 
-	test('should parse _wpCustomizeHeaderUploads into itself', function() {
+	test('should parse _wpCustomizeHeader.uploads into itself', function() {
 		equal(this.choiceList.length, 4);
 	});
 	
@@ -31,7 +31,7 @@ jQuery( function() {
 		}
 	});
 	
-	test('it should parse _wpCustomizeHeaderDefaults into itself', function() {
+	test('it should parse _wpCustomizeHeader.defaults into itself', function() {
 		equal(this.choiceList.length, 4);
 	});
 

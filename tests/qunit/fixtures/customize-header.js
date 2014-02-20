@@ -1,6 +1,6 @@
 window.wp = { customize: { get: function(){} } };
 window.api = wp.customize;
-window._wpCustomizeHeaderUploads = {
+window._wpCustomizeHeader.uploads = {
 	"cropped-abstract_00601126.jpg": {
 		"attachment_id": 1,
 		"url": "http://dev.local/2013/11/cropped-abstract_00601126.jpg",
@@ -26,7 +26,7 @@ window._wpCustomizeHeaderUploads = {
 		"timestamp": 1385045567
 	}
 };
-window._wpCustomizeHeaderDefaults = {
+window._wpCustomizeHeader.defaults = {
 	"circle": {
 		"url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/circle.png",
 		"thumbnail_url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/circle-thumbnail.png",
