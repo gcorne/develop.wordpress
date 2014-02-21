@@ -163,7 +163,7 @@
 	 * user-uploaded headers or theme-defined ones.
 	 *
 	 * Takes a wp.customize.HeaderTool.ChoiceList.
-	 * 
+	 *
 	 * @constructor
 	 * @augments Backbone.View
 	 */
@@ -235,7 +235,7 @@
 	 *
 	 * Aggregates wp.customize.HeaderTool.ChoiceList collections (or any
 	 * Backbone object, really) and acts as a bus to feed them events.
-	 * 
+	 *
 	 * @constructor
 	 * @augments Backbone.View
 	 */
