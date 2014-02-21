@@ -603,6 +603,17 @@
 	margin: 0;
 }
 
+.media-frame-title .suggested-dimensions {
+	font-size: 14px;
+	float: right;
+	margin-right: 20px;
+}
+
+.media-frame-content #crop-content {
+	width: 100%;
+	height: 100%;
+}
+
 /**
  * Iframes
  */
