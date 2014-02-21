@@ -43,7 +43,7 @@ class Custom_Image_Header {
 	var $default_headers = array();
 
 	/**
-	 * Holds custom headers uploaded by the user
+	 * Holds custom headers uploaded by the user.
 	 *
 	 * @var array
 	 * @since 3.2.0
@@ -60,9 +60,13 @@ class Custom_Image_Header {
 	 */
 	var $page = '';
 
-	// Should these go here?
-	var $header_image;
-	var $parent_attachment_id;
+	/**
+	 * ID of the attachment image from which we are cropping a new one.
+	 *
+	 * @var int
+	 * @since 3.9.0
+	 */
+	public $parent_attachment_id;
 
 	/**
 	 * Constructor - Register administration header callback.
