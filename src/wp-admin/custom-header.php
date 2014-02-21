@@ -82,9 +82,6 @@ class Custom_Image_Header {
 
 		if ( current_theme_supports( 'custom-header' ) ) {
 			add_action( 'customize_save_after', array( $this, 'set_last_used' ) );
-			// FIXME wasn't the z-index issue wpcom-only? do you get any issues on core by commenting this out?
-			// Can we just do this with CSS selectors? or shove in control?
-			//add_action( 'customize_controls_print_styles', array( $this, 'change_media_zindex' ) );
 			add_action( 'wp_ajax_header_crop', array( $this, 'ajax_header_crop' ) );
 			add_action( 'wp_ajax_header_add', array( $this, 'ajax_header_add' ) );
 			add_action( 'wp_ajax_header_remove', array( __CLASS__, 'ajax_header_remove' ) );
@@ -1118,14 +1115,6 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 		return $attachment_id;
 	}
-
-	function change_media_zindex() { ?>
-		<style>
-			.media-modal {
-					z-index: 1001000 !important;
-			}
-		</style>
-	<?php }
 
 	function ajax_check_nonce( $nonce, $attachment_id = null ) {
 		if ( ! isset( $nonce ) || ! wp_verify_nonce( $nonce,  'crop-image_' . $attachment_id ) ) {
