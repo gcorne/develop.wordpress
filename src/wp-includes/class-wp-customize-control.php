@@ -717,7 +717,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 		wp_enqueue_media();
 		wp_enqueue_script( 'customize-header-views' );
 
-		$this->prepare_control_urgh();
+		$this->prepare_control();
 
 		wp_localize_script( 'customize-header-views', '_wpCustomizeHeader', array(
 			'data' => array(
@@ -854,8 +854,6 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 	}
 
 	public function prepare_control() {
-	}
-	public function prepare_control_urgh() {
 		global $custom_image_header;
 		if ( empty( $custom_image_header ) )
 			return;
@@ -938,7 +936,6 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 	}
 
 	public function render_content() {
-		$this->prepare_control();
 		$this->print_header_image_template();
 		$visibility = $this->get_current_image_src() ? '' : ' style="display:none" ';
 		$width = absint( get_theme_support( 'custom-header', 'width' ) );
