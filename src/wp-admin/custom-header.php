@@ -1136,7 +1136,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	/**
 	 * Gets attachment uploaded by Media Manager, crops it, then saves it as a
 	 * new object. Returns JSON-encoded object details.
- 	 */
+	 */
 	function ajax_header_crop() {
 		$data = $_POST['data'];
 		$this->ajax_check_nonce( $data['nonces']['crop'], $data['id'] );
@@ -1181,7 +1181,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 * Given an attachment ID for a header image, updates its "last used"
 	 * timestamp to now.
 	 *
-	 * Should be triggered when the user tries adds a new header image from the
+	 * Triggered when the user tries adds a new header image from the
 	 * Media Manager, even if s/he doesn't save that change.
 	 */
 	function ajax_header_add() {
@@ -1199,6 +1199,13 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		die();
 	}
 
+	/**
+	 * Given an attachment ID for a header image, unsets it as a user-uploaded
+	 * header image for the current theme.
+	 *
+	 * Triggered when the user clicks the overlay "X" button next to each image
+	 * choice in the Customizer's Header tool.
+	 */
 	function ajax_header_remove() {
 		$data = $_POST['data'];
 		check_ajax_referer( 'header-remove', 'nonce' );
@@ -1213,7 +1220,6 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 
 		die();
 	}
-
 
 	function set_last_used( $manager ) {
 		$data = $manager->get_setting( 'header_image_data' )->post_value();
