@@ -234,6 +234,7 @@
 	 *
 	 * @constructor
 	 * @augments wp.customize.HeaderTool.ChoiceList
+	 * @augments Backbone.Collection
 	 */
 	api.HeaderTool.DefaultsList = api.HeaderTool.ChoiceList.extend({
 		initialize: function() {
