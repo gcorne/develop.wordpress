@@ -485,7 +485,6 @@
 
 			data.url = url;
 			data.thumbnail_url = url;
-			delete data.choice;
 
 			if (attachmentId)
 				data.attachment_id = attachmentId;
