@@ -62,7 +62,7 @@ jQuery( function() {
 		equal(this.model.shouldBeCropped(), false);
 	});
 
-	test('should be cropped when the image has the same dimensions of the theme image it returns true', function() {
+	test('should be cropped when the image has the same dimensions of the theme image', function() {
 		this.model.set({
 			themeFlexWidth: false,
 			themeFlexHeight: false,
@@ -73,7 +73,7 @@ jQuery( function() {
 		equal(this.model.shouldBeCropped(), true);
 	});
 
-	test('should not be cropped when the theme only supports flex width and the image has the same height as the theme image it returns false', function() {
+	test('should not be cropped when the theme only supports flex width and the image has the same height as the theme image', function() {
 		this.model.set({
 			themeFlexWidth: true,
 			themeFlexHeight: false,
@@ -84,7 +84,7 @@ jQuery( function() {
 		equal(this.model.shouldBeCropped(), false);
 	});
 
-	test('should not be cropped when the theme only supports flex height and the image has the same width as the theme imagereturns false', function() {
+	test('should not be cropped when the theme only supports flex height and the image has the same width as the theme image', function() {
 		this.model.set({
 			themeFlexWidth: false,
 			themeFlexHeight: true,
