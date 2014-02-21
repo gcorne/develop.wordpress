@@ -75,7 +75,7 @@ class Custom_Image_Header {
 	function __construct($admin_header_callback, $admin_image_div_callback = '') {
 		$this->admin_header_callback = $admin_header_callback;
 		$this->admin_image_div_callback = $admin_image_div_callback;
-		
+
 		if ( current_theme_supports( 'custom-header' ) ) {
 			add_action( 'customize_save_after', array( $this, 'set_last_used' ) );
 			// Can this go in the control?
@@ -1115,7 +1115,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 		return $attachment_id;
 	}
-	
+
 	function add_media_manager_templates() {
 		wp_print_media_templates();
 	}
@@ -1135,8 +1135,8 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	}
 
 	/**
- 	 * Gets attachment uploaded by Media Manager, crops it, then saves it as a
- 	 * new object. Returns JSON-encoded object details.
+	 * Gets attachment uploaded by Media Manager, crops it, then saves it as a
+	 * new object. Returns JSON-encoded object details.
  	 */
 	function ajax_header_crop() {
 		$data = $_POST['data'];
@@ -1166,7 +1166,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		$object = $this->create_attachment_object( $cropped, $attachment_id );
 
 		unset( $object['ID'] );
-		
+
 		$this->parent_attachment_id = $attachment_id;
 		$new_attachment_id = $this->insert_attachment( $object, $cropped );
 
@@ -1184,7 +1184,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 *
 	 * Should be triggered when the user tries adds a new header image from the
 	 * Media Manager, even if s/he doesn't save that change.
- 	 */
+	 */
 	function ajax_header_add() {
 		$data = $_POST['data'];
 		check_ajax_referer( 'header-add', 'nonce' );

@@ -3,8 +3,20 @@
 	var api = wp.customize;
 	api.HeaderTool = {};
 
-	api.HeaderTool.ImageModel = Backbone.Model.extend({
 
+	/**
+	 * wp.customize.HeaderTool.ImageModel
+	 *
+	 * A header image. This is where saves via the Customizer API are
+	 * abstracted away, plus our own AJAX calls to add images to and remove
+	 * images from the user's recently uploaded images setting on the server.
+	 * These calls are made regardless of whether the user actually saves new
+	 * Customizer settings.
+	 *
+	 * @constructor
+	 * @augments Backbone.Model
+	 */
+	api.HeaderTool.ImageModel = Backbone.Model.extend({
 		defaults: function() {
 			return {
 				header: {
@@ -111,6 +123,13 @@
 		}
 	});
 
+
+	/**
+	 * wp.customize.HeaderTool.ChoiceList
+	 *
+	 * @constructor
+	 * @augments Backbone.Collection
+	 */
 	api.HeaderTool.ChoiceList = Backbone.Collection.extend({
 		model: api.HeaderTool.ImageModel,
 
@@ -189,7 +208,7 @@
 
 			if (model) {
 				model.set('hidden', true);
-				// Bump images to top except for special "Random Image" images
+				// Bump images to top except for special "Randomize" images
 				if (!model.get('random')) {
 					model.get('header').timestamp = Date.now();
 					this.sort();
@@ -209,6 +228,13 @@
 		}
 	});
 
+
+	/**
+	 * wp.customize.HeaderTool.DefaultsList
+	 *
+	 * @constructor
+	 * @augments wp.customize.HeaderTool.ChoiceList
+	 */
 	api.HeaderTool.DefaultsList = api.HeaderTool.ChoiceList.extend({
 		initialize: function() {
 			this.type = 'default';

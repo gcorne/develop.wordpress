@@ -4,6 +4,17 @@
 	var api = wp.customize, frame, CombinedList, UploadsList, DefaultsList;
 
 
+	/**
+	 * wp.customize.HeaderTool.CurrentView
+	 *
+	 * Displays the currently selected header image, or a placeholder in lack
+	 * thereof.
+	 *
+	 * Instantiate with model wp.customize.HeaderTool.currentHeader.
+	 *
+	 * @constructor
+	 * @augments Backbone.View
+	 */
 	api.HeaderTool.CurrentView = Backbone.View.extend({
 		template: _.template($('#tmpl-header-current').html()),
 
@@ -65,6 +76,20 @@
 	});
 
 
+	/**
+	 * wp.customize.HeaderTool.ChoiceView
+	 *
+	 * Represents a choosable header image, be it user-uploaded,
+	 * theme-suggested or a special Randomize choice.
+	 *
+	 * Takes a wp.customize.HeaderTool.ImageModel.
+	 *
+	 * Manually changes model wp.customize.HeaderTool.currentHeader via the
+	 * `select` method.
+	 *
+	 * @constructor
+	 * @augments Backbone.View
+	 */
 	(function () { // closures FTW
 	var lastHeight = 0;
 	api.HeaderTool.ChoiceView = Backbone.View.extend({
@@ -146,6 +171,17 @@
 	})();
 
 
+	/**
+	 * wp.customize.HeaderTool.ChoiceListView
+	 *
+	 * A container for ChoiceViews. These choices should be of one same type:
+	 * user-uploaded headers or theme-defined ones.
+	 *
+	 * Takes a wp.customize.HeaderTool.ChoiceList.
+	 * 
+	 * @constructor
+	 * @augments Backbone.View
+	 */
 	api.HeaderTool.ChoiceListView = Backbone.View.extend({
 		slimScrollOptions: {
 			disableFadeOut: true,
@@ -183,13 +219,13 @@
 
 		maxListHeight: function() {
 			var shown = this.collection.shown(),
-					imgsHeight = shown.reduce( function(memo, img, index) {
-						var imgMargin = ( shown.length - 1)  === index ? 0 : 9,
-								height = ( 260 / img.get('header').width ) * img.get('header').height;
+				imgsHeight = shown.reduce( function(memo, img, index) {
+					var imgMargin = (shown.length - 1)  === index ? 0 : 9,
+						height = (260 / img.get('header').width) * img.get('header').height;
 
-						return memo + height + 5 + imgMargin;
-					}, 0);
-			return Math.min( Math.ceil( imgsHeight ), 180 );
+					return memo + height + 5 + imgMargin;
+				}, 0);
+			return Math.min( Math.ceil(imgsHeight), 180 );
 		},
 
 		addOne: function(choice) {
@@ -208,7 +244,16 @@
 		}
 	});
 
-	// we'll need to rework these names, eh
+
+	/**
+	 * wp.customize.HeaderTool.CombinedList
+	 *
+	 * Aggregates wp.customize.HeaderTool.ChoiceList collections (or any
+	 * Backbone object, really) and acts as a bus to feed them events.
+	 * 
+	 * @constructor
+	 * @augments Backbone.View
+	 */
 	api.HeaderTool.CombinedList = Backbone.View.extend({
 		initialize: function(collections) {
 			this.collections = collections;
