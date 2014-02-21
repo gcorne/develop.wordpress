@@ -84,8 +84,9 @@ class Custom_Image_Header {
 			add_action( 'customize_save_after', array( $this, 'set_last_used' ) );
 			// Can this go in the control?
 			add_action( 'customize_controls_print_footer_scripts', array( $this, 'add_media_manager_templates' ) );
+			// FIXME wasn't the z-index issue wpcom-only? do you get any issues on core by commenting this out?
 			// Can we just do this with CSS selectors? or shove in control?
-			add_action( 'customize_controls_print_styles', array( $this, 'change_media_zindex' ) );
+			//add_action( 'customize_controls_print_styles', array( $this, 'change_media_zindex' ) );
 			add_action( 'wp_ajax_header_crop', array( $this, 'ajax_header_crop' ) );
 			add_action( 'wp_ajax_header_add', array( $this, 'ajax_header_add' ) );
 			add_action( 'wp_ajax_header_remove', array( __CLASS__, 'ajax_header_remove' ) );
