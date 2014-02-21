@@ -339,6 +339,15 @@
 			]);
 		},
 
+		/**
+		 * Returns a set of options, computed from the attached image data and
+		 * theme-specific data, to be fed to the imgAreaSelect plugin in
+		 * wp.media.view.Cropper.
+		 *
+		 * @param {wp.media.model.Attachment} attachment
+		 * @param {wp.media.controller.Cropper} controller
+		 * @returns {Object} Options
+		 */
 		calculateImageSelectOptions: function(attachment, controller) {
 			var xInit = parseInt(_wpCustomizeHeader.data.width, 10),
 				yInit = parseInt(_wpCustomizeHeader.data.height, 10),
@@ -401,6 +410,14 @@
 			return imgSelectOptions;
 		},
 
+		/**
+		 * Sets up and opens the Media Manager in order to select an image.
+		 * Depending on both the size of the image and the properties of the
+		 * current theme, a cropping step after selection may be required or
+		 * skippable.
+		 *
+		 * @param {event} event
+		 */
 		openMM: function(event) {
 			var title, suggestedWidth, suggestedHeight,
 				l10n = _wpMediaViewsL10n;
@@ -453,6 +470,16 @@
 			frame.open();
 		},
 
+		/**
+		 * Creates a new wp.customize.HeaderTool.ImageModel from provided
+		 * header image data and inserts it into the user-uploaded headers
+		 * collection.
+		 *
+		 * @param {String} url
+		 * @param {Number} attachmentId
+		 * @param {Number} width
+		 * @param {Number} height
+		 */
 		setImageFromURL: function(url, attachmentId, width, height) {
 			var choice, data = {};
 
@@ -479,6 +506,10 @@
 			choice.importImage();
 		},
 
+		/**
+		 * Triggers the necessary events to deselect an image which was set as
+		 * the currently selected one.
+		 */
 		removeImage: function() {
 			api.HeaderTool.currentHeader.trigger('hide');
 			api.HeaderTool.CombinedList.trigger('control:removeImage');

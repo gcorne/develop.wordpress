@@ -5336,8 +5336,11 @@
 	/**
 	 * wp.media.view.Cropper
 	 *
-	 * Uses the imgAreaSelect plugin to allow a user to crop an image
+	 * Uses the imgAreaSelect plugin to allow a user to crop an image.
+	 *
 	 * Takes imgAreaSelect options from
+	 * wp.customize.HeaderControl.calculateImageSelectOptions via
+	 * wp.customize.HeaderControl.openMM.
 	 *
 	 * @constructor
 	 * @augments wp.media.View

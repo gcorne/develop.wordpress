@@ -1120,11 +1120,11 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	}
 
 	function change_media_zindex() { ?>
-			<style>
+		<style>
 			.media-modal {
 					z-index: 1001000 !important;
 			}
-			</style>
+		</style>
 	<?php }
 
 	function ajax_check_nonce( $nonce, $attachment_id = null ) {
