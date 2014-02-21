@@ -145,27 +145,12 @@
 		select: function() {
 			this.model.save();
 			api.HeaderTool.currentHeader.set(this.extendedModel());
-			this.sendStats();
 		},
 
 		removeImage: function(e) {
 			e.stopPropagation();
 			this.model.destroy();
 			this.remove();
-		},
-
-		sendStats: function() {
-			if (this.model.get('random')) {
-				Backbone.trigger('custom-header:stat', this.model.get('choice') + '-selected');
-				return;
-			}
-
-			if (this.model.get('header').defaultName) {
-				Backbone.trigger('custom-header:stat', 'default-header-image-selected');
-			} else {
-				Backbone.trigger('custom-header:stat', 'uploaded-header-image-selected');
-			}
-
 		}
 	});
 	})();

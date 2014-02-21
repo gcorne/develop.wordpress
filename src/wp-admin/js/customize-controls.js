@@ -441,7 +441,6 @@
 					w = croppedImage.width,
 					h = croppedImage.height;
 				this.setImageFromURL(url, attachmentId, w, h);
-				Backbone.trigger('custom-header:stat', 'cropped-image');
 			}, this);
 
 			frame.on('skippedcrop', function(selection) {
@@ -449,7 +448,6 @@
 					w = selection.get('width'),
 					h = selection.get('height');
 				this.setImageFromURL(url, selection.id, w, h);
-				Backbone.trigger('custom-header:stat', 'skipped-cropping');
 			}, this);
 
 			frame.open();
@@ -484,7 +482,6 @@
 		removeImage: function() {
 			api.HeaderTool.currentHeader.trigger('hide');
 			api.HeaderTool.CombinedList.trigger('control:removeImage');
-			Backbone.trigger('custom-header:stat', 'header-removed');
 		}
 
 	});
