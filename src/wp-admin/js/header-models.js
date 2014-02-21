@@ -95,27 +95,23 @@
 		},
 
 		shouldBeCropped: function() {
-			if ( this.get('themeFlexWidth') === true &&
-						this.get('themeFlexHeight') === true )
-			{
+			if (this.get('themeFlexWidth') === true &&
+						this.get('themeFlexHeight') === true) {
 				return false;
 			}
 
-			if ( this.get('themeFlexWidth') === true &&
-					 this.get('themeHeight') === this.get('imageHeight') )
-			{
+			if (this.get('themeFlexWidth') === true &&
+					 this.get('themeHeight') === this.get('imageHeight')) {
 				return false;
 			}
 
-			if ( this.get('themeFlexHeight') === true &&
-					 this.get('themeWidth') === this.get('imageWidth') )
-			{
+			if (this.get('themeFlexHeight') === true &&
+					 this.get('themeWidth') === this.get('imageWidth')) {
 				return false;
 			}
 
-			if ( this.get('themeWidth') === this.get('imageWidth') &&
-					 this.get('themeHeight') === this.get('imageHeight') )
-			{
+			if (this.get('themeWidth') === this.get('imageWidth') &&
+					 this.get('themeHeight') === this.get('imageHeight')) {
 				return false;
 			}
 
@@ -133,6 +129,7 @@
 	api.HeaderTool.ChoiceList = Backbone.Collection.extend({
 		model: api.HeaderTool.ImageModel,
 
+		// Ordered from most recently used to least
 		comparator: function(model) {
 			return -model.get('header').timestamp;
 		},
@@ -141,9 +138,11 @@
 			var current = api.HeaderTool.currentHeader.get('choice').replace(/^https?:\/\//, ''),
 				isRandom = this.isRandomChoice(api.get().header_image);
 
+			// Overridable by an extending class
 			if (!this.type)
 				this.type = 'uploaded';
 
+			// Overridable by an extending class
 			if (!this.data)
 				this.data = _wpCustomizeHeader.uploads;
 

@@ -341,11 +341,11 @@
 
 		calculateImageSelectOptions: function(attachment, controller) {
 			var xInit = parseInt(_wpCustomizeHeader.data.width, 10),
-					yInit = parseInt(_wpCustomizeHeader.data.height, 10),
-					flexWidth = !! parseInt(_wpCustomizeHeader.data['flex-width'], 10),
-					flexHeight = !! parseInt(_wpCustomizeHeader.data['flex-height'], 10),
-					ratio, xImg, yImg, realHeight, realWidth,
-					imgSelectOptions;
+				yInit = parseInt(_wpCustomizeHeader.data.height, 10),
+				flexWidth = !! parseInt(_wpCustomizeHeader.data['flex-width'], 10),
+				flexHeight = !! parseInt(_wpCustomizeHeader.data['flex-height'], 10),
+				ratio, xImg, yImg, realHeight, realWidth,
+				imgSelectOptions;
 
 			realWidth = attachment.get('width');
 			realHeight = attachment.get('height');
@@ -388,25 +388,22 @@
 				y2: yInit
 			};
 
-
-			if (flexHeight === false && flexWidth === false)
-			{
+			if (flexHeight === false && flexWidth === false) {
 				imgSelectOptions.aspectRatio = xInit + ':' + yInit;
 			}
-			if (flexHeight === false )
-			{
+			if (flexHeight === false ) {
 				imgSelectOptions.maxHeight = yInit;
 			}
-			if (flexWidth === false )
-			{
+			if (flexWidth === false ) {
 				imgSelectOptions.maxWidth = xInit;
 			}
 
 			return imgSelectOptions;
 		},
+
 		openMM: function(event) {
 			var title, suggestedWidth, suggestedHeight,
-					l10n = _wpMediaViewsL10n;
+				l10n = _wpMediaViewsL10n;
 
 			event.preventDefault();
 
@@ -434,11 +431,11 @@
 
 			frame.states.add([new wp.media.controller.Cropper()]);
 
-			frame.on( 'select', function() {
+			frame.on('select', function() {
 				frame.setState('cropper');
 			});
 
-			frame.on( 'cropped', function(croppedImage) {
+			frame.on('cropped', function(croppedImage) {
 				var url = croppedImage.post_content,
 					attachmentId = croppedImage.attachment_id,
 					w = croppedImage.width,
