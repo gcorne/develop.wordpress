@@ -308,14 +308,10 @@
 
 	api.HeaderControl = api.Control.extend({
 		ready: function() {
-			this.btnEdit          = $('.actions .edit');
 			this.btnRemove        = $('.actions .remove');
 			this.btnNew           = $('.actions .new');
 
 			_.bindAll(this, 'openMM', 'removeImage');
-
-			// Hide for now, until we implement it
-			this.btnEdit.hide();
 
 			this.btnNew.on( 'click', this.openMM );
 			this.btnRemove.on( 'click', this.removeImage );

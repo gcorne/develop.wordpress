@@ -971,10 +971,6 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 				</div>
 			</div>
 			<div class="actions">
-<?php if ( false ) : ?>
-				<?php /* translators: Edit as in edit current header image via the Customizer */ ?>
-				<a href="#" <?php echo $visibility ?> class="button edit"><?php _e( 'Edit', 'custom-header' ); ?></a>
-<?php endif ?>
 				<?php /* translators: Hide as in hide header image via the Customizer */ ?>
 				<a href="#" <?php echo $visibility ?> class="button remove"><?php _e( 'Hide', 'custom-header' ); ?></a>
 				<?php /* translators: New as in add new header image via the Customizer */ ?>

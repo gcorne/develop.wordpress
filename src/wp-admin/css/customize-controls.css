@@ -465,7 +465,7 @@ body {
 	margin-bottom: 18px;
 }
 
-/* Current image container */
+/* Header control: current image container */
 
 #customize-control-header_image .current .container {
 	overflow: hidden;
@@ -493,8 +493,7 @@ body:not(.blue) #customize-control-header_image .inner {
 	color: #eee;
 }
 
-
-/* Overlay "close" button */
+/* Header control: overlay "close" button */
 
 #customize-control-header_image .header-view {
 	position: relative;
@@ -517,8 +516,7 @@ body:not(.blue) #customize-control-header_image .inner {
 	visibility: visible;
 }
 
-
-/* Randomiz(s)er */
+/* Header control: randomiz(s)er */
 
 #customize-control-header_image .random.placeholder {
 	cursor: pointer;
@@ -570,6 +568,8 @@ body:not(.blue) #customize-control-header_image .inner {
 	100% { color: #d4b146; }
 }
 
+/* Header control: actions and choices */
+
 #customize-control-header_image .actions {
 	margin-bottom: 32px;
 }
@@ -600,7 +600,6 @@ body:not(.blue) #customize-control-header_image .inner {
 	border-radius: 2px;
 }
 
-#customize-control-header_image .edit,
 #customize-control-header_image .remove {
 	float: left;
 	margin-right: 3px;
@@ -621,6 +620,7 @@ body:not(.blue) #customize-control-header_image .inner {
 	float: right;
 	margin-right: 20px;
 }
+
 
 /** Handle cheaters. */
 body.cheatin {
