@@ -551,15 +551,6 @@ function wp_default_styles( &$styles ) {
 	$styles->text_direction = function_exists( 'is_rtl' ) && is_rtl() ? 'rtl' : 'ltr';
 	$styles->default_dirs = array('/wp-admin/', '/wp-includes/css/');
 
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	$rtl_styles = array( 'wp-admin', 'ie', 'media', 'admin-bar', 'customize-controls', 'media-views', 'wp-color-picker', 'wp-pointer', 'editor-buttons', 'farbtastic', 'wp-auth-check', 'wp-jquery-ui-dialog', 'media-views', 'buttons', 'install' );
-
-	$styles->add( 'wp-admin', "/wp-admin/css/wp-admin$suffix.css", array( 'open-sans', 'dashicons' ) );
-
-	$styles->add( 'ie', "/wp-admin/css/ie$suffix.css" );
-	$styles->add_data( 'ie', 'conditional', 'lte IE 7' );
-
 	$open_sans_font_url = '';
 
 	/* translators: If there are characters in your language that are not supported
@@ -585,36 +576,64 @@ function wp_default_styles( &$styles ) {
 		$open_sans_font_url = "//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,400,600&subset=$subsets";
 	}
 
+	// Register a stylesheet for the selected admin color scheme.
+	$colors_url = false;
+	if ( ! empty( $GLOBALS['_wp_admin_css_colors'] ) ) {
+		$color = get_user_option( 'admin_color' );
+		if ( ! $color || ! isset( $GLOBALS['_wp_admin_css_colors'][ $color ] ) ) {
+			$color = 'fresh';
+		}
+		$colors_url = $GLOBALS['_wp_admin_css_colors'][ $color ]->url;
+	}
+	$styles->add( 'colors', $colors_url, array( 'wp-admin', 'buttons', 'open-sans', 'dashicons' ) );
+
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+
+	// Admin CSS
+	$styles->add( 'wp-admin',           "/wp-admin/css/wp-admin$suffix.css", array( 'open-sans', 'dashicons' ) );
+	$styles->add( 'login',              "/wp-admin/css/login$suffix.css", array( 'buttons', 'open-sans', 'dashicons' ) );
+	$styles->add( 'install',            "/wp-admin/css/install$suffix.css", array( 'buttons', 'open-sans' ) );
+	$styles->add( 'wp-color-picker',    "/wp-admin/css/color-picker$suffix.css" );
+	$styles->add( 'customize-controls', "/wp-admin/css/customize-controls$suffix.css", array( 'wp-admin', 'colors', 'ie' ) );
+	$styles->add( 'ie',                 "/wp-admin/css/ie$suffix.css" );
+
+	$styles->add_data( 'ie', 'conditional', 'lte IE 7' );
+
+	// Common dependencies
+	$styles->add( 'buttons',   "/wp-includes/css/buttons$suffix.css" );
+	$styles->add( 'dashicons', "/wp-includes/css/dashicons$suffix.css" );
 	$styles->add( 'open-sans', $open_sans_font_url );
 
-	// Dashicons
-	$styles->add( 'dashicons', "/wp-includes/css/dashicons$suffix.css" );
-
-	// Register "meta" stylesheet for admin colors. All colors-* style sheets should have the same version string.
-
-	$styles->add( 'colors', true, array( 'wp-admin', 'buttons', 'open-sans', 'dashicons' ) );
-
-	// do not refer to this directly, the right one is queued by the above "meta" colors handle
-	$styles->add( 'colors-fresh', false, array( 'wp-admin', 'buttons' ) );
-
-	$styles->add( 'media', "/wp-admin/css/media$suffix.css" );
-	$styles->add( 'install', "/wp-admin/css/install$suffix.css", array( 'buttons', 'open-sans' ) );
-	$styles->add( 'thickbox', '/wp-includes/js/thickbox/thickbox.css', array( 'dashicons' ), '20131201' );
-	$styles->add( 'farbtastic', '/wp-admin/css/farbtastic.css', array(), '1.3u1' );
-	$styles->add( 'wp-color-picker', "/wp-admin/css/color-picker$suffix.css" );
-	$styles->add( 'jcrop', "/wp-includes/js/jcrop/jquery.Jcrop.min.css", array(), '0.9.12' );
-	$styles->add( 'imgareaselect', '/wp-includes/js/imgareaselect/imgareaselect.css', array(), '0.9.8' );
-	$styles->add( 'admin-bar', "/wp-includes/css/admin-bar$suffix.css", array( 'open-sans', 'dashicons' ) );
-	$styles->add( 'wp-jquery-ui-dialog', "/wp-includes/css/jquery-ui-dialog$suffix.css", array( 'dashicons' ) );
+	// Includes CSS
+	$styles->add( 'admin-bar',      "/wp-includes/css/admin-bar$suffix.css", array( 'open-sans', 'dashicons' ) );
+	$styles->add( 'wp-auth-check',  "/wp-includes/css/wp-auth-check$suffix.css", array( 'dashicons' ) );
 	$styles->add( 'editor-buttons', "/wp-includes/css/editor$suffix.css", array( 'dashicons' ) );
-	$styles->add( 'wp-pointer', "/wp-includes/css/wp-pointer$suffix.css", array( 'dashicons' ) );
-	$styles->add( 'customize-controls', "/wp-admin/css/customize-controls$suffix.css", array( 'wp-admin', 'colors', 'ie' ) );
-	$styles->add( 'media-views', "/wp-includes/css/media-views$suffix.css", array( 'buttons', 'dashicons' ) );
-	$styles->add( 'buttons', "/wp-includes/css/buttons$suffix.css" );
-	$styles->add( 'wp-auth-check', "/wp-includes/css/wp-auth-check$suffix.css", array( 'dashicons' ) );
+	$styles->add( 'media-views',    "/wp-includes/css/media-views$suffix.css", array( 'buttons', 'dashicons' ) );
+	$styles->add( 'wp-pointer',     "/wp-includes/css/wp-pointer$suffix.css", array( 'dashicons' ) );
 
-	$styles->add( 'mediaelement', "/wp-includes/js/mediaelement/mediaelementplayer.min.css", array(), '2.13.0' );
-	$styles->add( 'wp-mediaelement', "/wp-includes/js/mediaelement/wp-mediaelement.css", array( 'mediaelement' ) );
+	// External libraries and friends
+	$styles->add( 'imgareaselect',       '/wp-includes/js/imgareaselect/imgareaselect.css', array(), '0.9.8' );
+	$styles->add( 'wp-jquery-ui-dialog', "/wp-includes/css/jquery-ui-dialog$suffix.css", array( 'dashicons' ) );
+	$styles->add( 'mediaelement',        "/wp-includes/js/mediaelement/mediaelementplayer.min.css", array(), '2.13.0' );
+	$styles->add( 'wp-mediaelement',     "/wp-includes/js/mediaelement/wp-mediaelement.css", array( 'mediaelement' ) );
+	$styles->add( 'thickbox',            '/wp-includes/js/thickbox/thickbox.css', array( 'dashicons' ), '20131201' );
+
+	// Deprecated CSS
+	$styles->add( 'media',      "/wp-admin/css/deprecated-media$suffix.css" );
+	$styles->add( 'farbtastic', '/wp-admin/css/farbtastic.css', array(), '1.3u1' );
+	$styles->add( 'jcrop',      "/wp-includes/js/jcrop/jquery.Jcrop.min.css", array(), '0.9.12' );
+	$styles->add( 'colors-fresh', false, array( 'wp-admin', 'buttons' ) ); // Old handle.
+
+	// RTL CSS
+	$rtl_styles = array(
+		// wp-admin
+		'wp-admin', 'install', 'wp-color-picker', 'customize-controls', 'ie',
+		// wp-includes
+		'buttons', 'admin-bar', 'wp-auth-check', 'editor-buttons', 'media-views', 'wp-pointer',
+		'wp-jquery-ui-dialog',
+		// deprecated
+		'media', 'farbtastic',
+	);
 
 	foreach ( $rtl_styles as $rtl_style ) {
 		$styles->add_data( $rtl_style, 'rtl', 'replace' );
@@ -663,56 +682,6 @@ function wp_just_in_time_script_localization() {
 		'blog_id' => get_current_blog_id(),
 	) );
 
-}
-
-/**
- * Administration Screen CSS for changing the styles.
- *
- * If installing the 'wp-admin/' directory will be replaced with './'.
- *
- * The $_wp_admin_css_colors global manages the Administration Screens CSS
- * stylesheet that is loaded. The option that is set is 'admin_color' and is the
- * color and key for the array. The value for the color key is an object with
- * a 'url' parameter that has the URL path to the CSS file.
- *
- * The query from $src parameter will be appended to the URL that is given from
- * the $_wp_admin_css_colors array value URL.
- *
- * @since 2.6.0
- * @uses $_wp_admin_css_colors
- *
- * @param string $src Source URL.
- * @param string $handle Either 'colors' or 'colors-rtl'.
- * @return string URL path to CSS stylesheet for Administration Screens.
- */
-function wp_style_loader_src( $src, $handle ) {
-	if ( defined('WP_INSTALLING') )
-		return preg_replace( '#^wp-admin/#', './', $src );
-
-	if ( 'colors' == $handle || 'colors-rtl' == $handle ) {
-		global $_wp_admin_css_colors;
-		$color = get_user_option('admin_color');
-
-		if ( empty($color) || !isset($_wp_admin_css_colors[$color]) )
-			$color = 'fresh';
-
-		$color = $_wp_admin_css_colors[$color];
-		$parsed = parse_url( $src );
-		$url = $color->url;
-
-		if ( ! $url ) {
-			return false;
-		}
-
-		if ( isset($parsed['query']) && $parsed['query'] ) {
-			wp_parse_str( $parsed['query'], $qv );
-			$url = add_query_arg( $qv, $url );
-		}
-
-		return $url;
-	}
-
-	return $src;
 }
 
 /**
@@ -961,4 +930,3 @@ add_filter( 'wp_print_scripts', 'wp_just_in_time_script_localization' );
 add_filter( 'print_scripts_array', 'wp_prototype_before_jquery' );
 
 add_action( 'wp_default_styles', 'wp_default_styles' );
-add_filter( 'style_loader_src', 'wp_style_loader_src', 10, 2 );
