@@ -82,8 +82,6 @@ class Custom_Image_Header {
 
 		if ( current_theme_supports( 'custom-header' ) ) {
 			add_action( 'customize_save_after', array( $this, 'set_last_used' ) );
-			// Can this go in the control?
-			add_action( 'customize_controls_print_footer_scripts', array( $this, 'add_media_manager_templates' ) );
 			// FIXME wasn't the z-index issue wpcom-only? do you get any issues on core by commenting this out?
 			// Can we just do this with CSS selectors? or shove in control?
 			//add_action( 'customize_controls_print_styles', array( $this, 'change_media_zindex' ) );
@@ -1119,10 +1117,6 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		$metadata = apply_filters( 'wp_header_image_attachment_metadata', $metadata );
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 		return $attachment_id;
-	}
-
-	function add_media_manager_templates() {
-		wp_print_media_templates();
 	}
 
 	function change_media_zindex() { ?>
