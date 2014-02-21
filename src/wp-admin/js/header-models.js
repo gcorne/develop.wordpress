@@ -131,10 +131,6 @@
 			if (isRandom) {
 				// So that when adding data we don't hide regular images
 				current = api.get().header_image;
-				// We need a Controls rewrite so that we can just change the
-				// model for the current image and have the Views react to
-				// that. In the meantime, this is acceptable:
-				api.HeaderTool.currentHeader.trigger('setImage', this.randomImageUrl);
 			}
 
 			this.on('control:setImage', this.setImage, this);

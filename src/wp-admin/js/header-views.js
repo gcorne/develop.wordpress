@@ -2,9 +2,6 @@
 ;( function( $, wp, _ ) {
 	if ( ! wp || ! wp.customize ) { return; }
 	var api = wp.customize, frame, CombinedList, UploadsList, DefaultsList;
-	api.HeaderTool.currentImage = {};
-
-	/* Customizer Controls */
 
 
 	api.HeaderTool.CurrentView = Backbone.View.extend({
