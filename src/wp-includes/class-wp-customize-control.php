@@ -750,8 +750,9 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 		// Get *the* default image if there is one
 		$default = get_theme_support( 'custom-header', 'default-image' );
 
-		if ( ! $default ) // If not,
+		if ( ! $default ) { // If not,
 			return $custom_image_header->default_headers; // easy peasy.
+		}
 
 		$default = sprintf( $default,
 			get_template_directory_uri(),
@@ -842,10 +843,12 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 				'timestamp'     => $timestamp ? $timestamp : 0,
 			);
 
-			if ( isset( $header_data['width'] ) )
+			if ( isset( $header_data['width'] ) ) {
 				$h['width'] = $header_data['width'];
-			if ( isset( $header_data['height'] ) )
+			}
+			if ( isset( $header_data['height'] ) ) {
 				$h['height'] = $header_data['height'];
+			}
 
 			$header_images[] = $h;
 		}
@@ -855,8 +858,9 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 
 	public function prepare_control() {
 		global $custom_image_header;
-		if ( empty( $custom_image_header ) )
+		if ( empty( $custom_image_header ) ) {
 			return;
+		}
 
 		// Process default headers and uploaded headers.
 		$custom_image_header->process_default_headers();
@@ -951,12 +955,14 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 					printf( __( 'While you can crop images to your liking after clicking <strong>%s</strong>, your theme recommends a header size of <strong>%dx%d</strong> pixels.' ),
 						_x( 'Add new', 'new image', 'custom-header' ), $width, $height );
 				} else {
-					if ( $width )
+					if ( $width ) {
 						printf( __( 'While you can crop images to your liking after clicking <strong>%s</strong>, your theme recommends a header width of <strong>%d</strong> pixels.' ),
 							_x( 'Add new', 'new image', 'custom-header' ), $width );
-					if ( $height )
+					}
+					if ( $height ) {
 						printf( __( 'While you can crop images to your liking after clicking <strong>%s</strong>, your theme recommends a header height of <strong>%d</strong> pixels.' ),
 							_x( 'Add new', 'new image', 'custom-header' ), $height );
+					}
 				}
 				?>
 			</p>
