@@ -84,7 +84,7 @@ class Custom_Image_Header {
 			add_action( 'customize_save_after', array( $this, 'set_last_used' ) );
 			add_action( 'wp_ajax_header_crop', array( $this, 'ajax_header_crop' ) );
 			add_action( 'wp_ajax_header_add', array( $this, 'ajax_header_add' ) );
-			add_action( 'wp_ajax_header_remove', array( __CLASS__, 'ajax_header_remove' ) );
+			add_action( 'wp_ajax_header_remove', array( $this, 'ajax_header_remove' ) );
 			add_filter( 'wp_prepare_attachment_for_js', array( $this, 'add_parent_attachment_js' ) , 11, 3);
 			add_filter( 'wp_header_image_attachment_metadata', array( $this, 'add_parent_attachment_id' ) , 11, 1);
 		}
