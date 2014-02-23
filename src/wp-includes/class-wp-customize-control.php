@@ -920,7 +920,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 			<div class="placeholder">
 				<div class="inner">
 					<span>
-						No image set.
+						<?php _e( 'No image set' ); ?>
 					</span>
 				</div>
 			</div>
