@@ -5375,19 +5375,19 @@
 	 * @augments Backbone.View
 	 */
 	media.view.Cropper = media.View.extend({
-		id: 'crop-content',
-		template: _.template('<img id="image-to-crop" src="<%= url %>" style="max-height: 100%; max-width: 100%; display: block; margin: auto;">'),
+		tagName: 'img',
+		className: 'crop-content',
 		initialize: function() {
-			_.bindAll( this, 'onImageLoad' );
+			_.bindAll(this, 'onImageLoad');
+			this.$el.attr('src', this.options.attachment.get('url'));
 		},
 		ready: function() {
-			this.$el.find('img').on('load', this.onImageLoad);
+			this.$el.on('load', this.onImageLoad);
 			$(window).on('resize', _.debounce(this.onImageLoad, 250));
 		},
 		remove: function() {
-			var img = this.$el.find('img');
-			img.remove();
-			img.off();
+			this.$el.remove();
+			this.$el.off();
 			wp.media.View.prototype.remove.apply(this, arguments);
 		},
 		prepare: function() {
@@ -5398,11 +5398,11 @@
 		},
 		onImageLoad: function() {
 			var imgOptions = this.controller.frame.options.imgSelectOptions;
-			if ( typeof imgOptions === 'function' ) {
+			if (typeof imgOptions === 'function') {
 				imgOptions = imgOptions(this.options.attachment, this.controller);
 			}
 			this.trigger('image-loaded');
-			this.controller.imgSelect = this.$el.find('img').imgAreaSelect(imgOptions);
+			this.controller.imgSelect = this.$el.imgAreaSelect(imgOptions);
 		}
 
 	});
