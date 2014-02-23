@@ -487,9 +487,6 @@ body {
 	height: 18px;
 	margin-top: -9px;
 	top: 50%;
-}
-
-body:not(.blue) #customize-control-header_image .inner {
 	color: #eee;
 }
 
