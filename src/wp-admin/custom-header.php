@@ -1152,7 +1152,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		$object['height']        = $dimensions['dst_height'];
 
 		echo json_encode($object);
-		die();
+		wp_die();
 	}
 
 	/**
@@ -1174,7 +1174,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		update_post_meta( $attachment_id, $key, time() );
 		update_post_meta( $attachment_id, '_wp_attachment_is_custom_header', get_stylesheet() );
 
-		die();
+		wp_die();
 	}
 
 	/**
@@ -1196,7 +1196,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		delete_post_meta( $attachment_id, $key );
 		delete_post_meta( $attachment_id, '_wp_attachment_is_custom_header', get_stylesheet() );
 
-		die();
+		wp_die();
 	}
 
 	function set_last_used( $manager ) {
