@@ -1,7 +1,7 @@
 <?php
 require_once( ABSPATH . 'wp-admin/custom-header.php');
 
-class Test_Header_Image_Cropping extends PHPUnit_Framework_TestCase {
+class Test_Header_Image_Cropping extends WP_UnitTestCase {
 	var $custom_image_header;
 
 	function setUp() {
