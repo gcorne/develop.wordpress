@@ -885,7 +885,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 			<% } else { %>
 
 			<% if (type == 'uploaded') { %>
-			<a href="#" class="close">X</a>
+			<div class="dashicons dashicons-no close"></div>
 			<% } %>
 
 			<a href="#" class="choice thumbnail %>"
