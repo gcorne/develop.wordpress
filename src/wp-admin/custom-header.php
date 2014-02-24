@@ -61,14 +61,6 @@ class Custom_Image_Header {
 	var $page = '';
 
 	/**
-	 * ID of the attachment image from which we are cropping a new one.
-	 *
-	 * @var int
-	 * @since 3.9.0
-	 */
-	public $parent_attachment_id;
-
-	/**
 	 * Constructor - Register administration header callback.
 	 *
 	 * @since 2.1.0
@@ -85,8 +77,6 @@ class Custom_Image_Header {
 			add_action( 'wp_ajax_header_crop', array( $this, 'ajax_header_crop' ) );
 			add_action( 'wp_ajax_header_add', array( $this, 'ajax_header_add' ) );
 			add_action( 'wp_ajax_header_remove', array( $this, 'ajax_header_remove' ) );
-			add_filter( 'wp_prepare_attachment_for_js', array( $this, 'add_parent_attachment_js' ) , 11, 3);
-			add_filter( 'wp_header_image_attachment_metadata', array( $this, 'add_parent_attachment_id' ) , 11, 1);
 		}
 
 		add_action( 'admin_menu', array( $this, 'init' ) );
@@ -1155,7 +1145,6 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 
 		unset( $object['ID'] );
 
-		$this->parent_attachment_id = $attachment_id;
 		$new_attachment_id = $this->insert_attachment( $object, $cropped );
 
 		$object['attachment_id'] = $new_attachment_id;
@@ -1219,15 +1208,5 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		$attachment_id = $data['attachment_id'];
 		$key = '_wp_attachment_custom_header_last_used_' . get_stylesheet();
 		update_post_meta( $attachment_id, $key, time() );
-	}
-
-	function add_parent_attachment_id( $metadata ) {
-		$metadata['parent_attachment_id'] = $this->parent_attachment_id;
-		return $metadata;
-	}
-
-	function add_parent_attachment_js($response, $attachment, $meta ){
-		$response['parentAttachmentId'] = isset( $meta['parent_attachment_id'] ) ? $meta['parent_attachment_id'] : 0;
-		return $response;
 	}
 }
