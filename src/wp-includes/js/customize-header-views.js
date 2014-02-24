@@ -168,12 +168,6 @@
 	 * @augments Backbone.View
 	 */
 	api.HeaderTool.ChoiceListView = Backbone.View.extend({
-		slimScrollOptions: {
-			disableFadeOut: true,
-			allowPageScroll: true,
-			height: 'auto'
-		},
-
 		initialize: function() {
 			this.listenTo(this.collection, 'add', this.addOne);
 			this.listenTo(this.collection, 'remove', this.render);
@@ -187,30 +181,6 @@
 			this.$el.empty();
 			this.collection.each(this.addOne, this);
 			this.toggleTitle();
-			if (this.$el.parents().hasClass('uploaded')) {
-				this.setMaxListHeight();
-			}
-		},
-
-		setMaxListHeight: function() {
-			if (this.$el.parents().hasClass('uploaded')) {
-				var uploaded = this.$el.parents('.uploaded'),
-					height   = this.maxListHeight();
-
-				uploaded.height(height);
-				this.$el.slimScroll(this.slimScrollOptions);
-			}
-		},
-
-		maxListHeight: function() {
-			var shown = this.collection.shown(),
-				imgsHeight = shown.reduce( function(memo, img, index) {
-					var imgMargin = (shown.length - 1)  === index ? 0 : 9,
-						height = (260 / img.get('header').width) * img.get('header').height;
-
-					return memo + height + 5 + imgMargin;
-				}, 0);
-			return Math.min( Math.ceil(imgsHeight), 180 );
 		},
 
 		addOne: function(choice) {
