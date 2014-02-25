@@ -434,7 +434,7 @@
 				text: l10n.chooseImage
 			};
 
-			frame = wp.media({
+			this.frame = wp.media({
 				title: title,
 				library: {
 					type: 'image'
@@ -447,28 +447,30 @@
 				imgSelectOptions: this.calculateImageSelectOptions
 			});
 
-			frame.states.add([new wp.media.controller.Cropper()]);
+			this.frame.states.add([new wp.media.controller.Cropper()]);
 
-			frame.on('select', function() {
-				frame.setState('cropper');
-			});
+			this.frame.on('select', this.onSelect, this);
+			this.frame.on('cropped', this.onCropped, this);
+			this.frame.on('skippedcrop', this.onSkippedCrop, this);
 
-			frame.on('cropped', function(croppedImage) {
-				var url = croppedImage.post_content,
-					attachmentId = croppedImage.attachment_id,
-					w = croppedImage.width,
-					h = croppedImage.height;
-				this.setImageFromURL(url, attachmentId, w, h);
-			}, this);
+			this.frame.open();
+		},
 
-			frame.on('skippedcrop', function(selection) {
-				var url = selection.get('url'),
-					w = selection.get('width'),
-					h = selection.get('height');
-				this.setImageFromURL(url, selection.id, w, h);
-			}, this);
-
-			frame.open();
+		onSelect: function() {
+			this.frame.setState('cropper');
+		},
+		onCropped: function(croppedImage) {
+			var url = croppedImage.post_content,
+				attachmentId = croppedImage.attachment_id,
+				w = croppedImage.width,
+				h = croppedImage.height;
+			this.setImageFromURL(url, attachmentId, w, h);
+		},
+		onSkippedCrop: function(selection) {
+			var url = selection.get('url'),
+				w = selection.get('width'),
+				h = selection.get('height');
+			this.setImageFromURL(url, selection.id, w, h);
 		},
 
 		/**
