@@ -1,3 +1,4 @@
+/* globals _wpCustomizeHeader, _wpMediaViewsL10n */
 (function( exports, $ ){
 	var api = wp.customize;
 
@@ -486,14 +487,17 @@
 			data.url = url;
 			data.thumbnail_url = url;
 
-			if (attachmentId)
+			if (attachmentId) {
 				data.attachment_id = attachmentId;
+			}
 
-			if (width)
+			if (width) {
 				data.width = width;
+			}
 
-			if (height)
+			if (height) {
 				data.height = height;
+			}
 
 			choice = new api.HeaderTool.ImageModel({
 				header: data,

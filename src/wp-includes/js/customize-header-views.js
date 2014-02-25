@@ -1,7 +1,7 @@
-/* globals jQuery, _, Backbone, _wpMediaViewsL10n, _wpCustomizeHeader */
+/* globals jQuery, _, Backbone, _wpCustomizeHeader */
 ;( function( $, wp, _ ) {
 	if ( ! wp || ! wp.customize ) { return; }
-	var api = wp.customize, frame, CombinedList, UploadsList, DefaultsList;
+	var api = wp.customize;
 
 
 	/**
@@ -33,7 +33,8 @@
 		getHeight: function() {
 			var image = this.$el.find('img'),
 				saved = this.model.get('savedHeight'),
-				height = image.height() || saved;
+				height = image.height() || saved,
+				headerImageData;
 
 			if (image.length) {
 				this.$el.find('.inner').hide();
@@ -43,16 +44,16 @@
 
 			// happens at ready
 			if (!height) {
-				var d = api.get().header_image_data;
+				headerImageData = api.get().header_image_data;
 
-				if (d && d.width && d.height) {
-					var w = d.width,
-						h = d.height;
+				if (headerImageData && headerImageData.width && headerImageData.height) {
 					// hardcoded container width
-					height = 260 / w * h;
+					height = 260 / headerImageData.width * headerImageData.height;
 				}
-				// fallback for when no image is set
-				else height = 40;
+				else {
+					// fallback for when no image is set
+					height = 40;
+				}
 			}
 
 			return height;
@@ -68,10 +69,11 @@
 
 		setButtons: function() {
 			var elements = $('.actions .remove');
-			if (this.model.get('choice'))
+			if (this.model.get('choice')) {
 				elements.show();
-			else
+			} else {
 				elements.hide();
+			}
 		}
 	});
 
@@ -109,8 +111,10 @@
 			];
 
 			this.listenTo(this.model, 'change', this.render);
-			if (_.contains(properties, api.get().header_image))
+
+			if (_.contains(properties, api.get().header_image)) {
 				api.HeaderTool.currentHeader.set(this.extendedModel());
+			}
 		},
 
 		render: function() {
@@ -118,10 +122,12 @@
 
 			this.$el.html(this.template(this.extendedModel()));
 
-			if (model.get('random'))
+			if (model.get('random')) {
 				this.setPlaceholder(40);
-			else
+			}
+			else {
 				lastHeight = this.getHeight();
+			}
 
 			this.$el.toggleClass('hidden', model.get('hidden'));
 			return this;
@@ -192,10 +198,11 @@
 
 		toggleTitle: function() {
 			var title = this.$el.parents().prev('.customize-control-title');
-			if (this.collection.shouldHideTitle())
+			if (this.collection.shouldHideTitle()) {
 				title.hide();
-			else
+			} else {
 				title.show();
+			}
 		}
 	});
 
@@ -218,7 +225,7 @@
 			_.each(this.collections, function(collection) {
 				collection.trigger(event, arg);
 			});
-		},
+		}
 	});
 
 })( jQuery, this.wp, _ );

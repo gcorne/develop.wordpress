@@ -1,4 +1,4 @@
-/* globals jQuery, _wpCustomizeHeader */
+/* globals jQuery, _wpCustomizeHeader, _wpCustomizeSettings */
 ;( function( $, wp ) {
 	var api = wp.customize;
 	api.HeaderTool = {};
@@ -47,8 +47,9 @@
 
 			// If the image we're removing is also the current header, unset
 			// the latter
-			if (curr && data.attachment_id == curr)
+			if (curr && data.attachment_id === curr) {
 				api.HeaderTool.currentHeader.trigger('hide');
+			}
 
 			$.post(_wpCustomizeSettings.url.ajax, {
 				wp_customize: 'on',
@@ -81,8 +82,9 @@
 
 		importImage: function() {
 			var data = this.get('header');
-			if (data.attachment_id === undefined)
+			if (data.attachment_id === undefined) {
 				return;
+			}
 
 			$.post(_wpCustomizeSettings.url.ajax, {
 				wp_customize: 'on',
@@ -101,17 +103,17 @@
 			}
 
 			if (this.get('themeFlexWidth') === true &&
-					 this.get('themeHeight') === this.get('imageHeight')) {
+				this.get('themeHeight') === this.get('imageHeight')) {
 				return false;
 			}
 
 			if (this.get('themeFlexHeight') === true &&
-					 this.get('themeWidth') === this.get('imageWidth')) {
+				this.get('themeWidth') === this.get('imageWidth')) {
 				return false;
 			}
 
 			if (this.get('themeWidth') === this.get('imageWidth') &&
-					 this.get('themeHeight') === this.get('imageHeight')) {
+				this.get('themeHeight') === this.get('imageHeight')) {
 				return false;
 			}
 
@@ -139,12 +141,14 @@
 				isRandom = this.isRandomChoice(api.get().header_image);
 
 			// Overridable by an extending class
-			if (!this.type)
+			if (!this.type) {
 				this.type = 'uploaded';
+			}
 
 			// Overridable by an extending class
-			if (!this.data)
+			if (!this.data) {
 				this.data = _wpCustomizeHeader.uploads;
+			}
 
 			if (isRandom) {
 				// So that when adding data we don't hide regular images
@@ -156,23 +160,26 @@
 			this.on('add', this.maybeAddRandomChoice, this);
 
 			_.each(this.data, function(elt, index) {
-				if (!elt.attachment_id)
+				if (!elt.attachment_id) {
 					elt.defaultName = index;
+				}
 
 				this.add({
 					header: elt,
 					choice: elt.url.split('/').pop(),
-					hidden: current == elt.url.replace(/^https?:\/\//, '')
+					hidden: current === elt.url.replace(/^https?:\/\//, '')
 				}, { silent: true });
 			}, this);
 
-			if (this.size() > 0)
+			if (this.size() > 0) {
 				this.addRandomChoice(current);
+			}
 		},
 
 		maybeAddRandomChoice: function() {
-			if (this.size() === 1)
+			if (this.size() === 1) {
 				this.addRandomChoice();
+			}
 		},
 
 		addRandomChoice: function(initialChoice) {
@@ -193,7 +200,7 @@
 		},
 
 		isRandomChoice: function(choice) {
-			return /^random-(uploaded|default)-image$/.test(choice);
+			return (/^random-(uploaded|default)-image$/).test(choice);
 		},
 
 		shouldHideTitle: function() {
