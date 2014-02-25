@@ -1,5 +1,5 @@
-window.wp = { customize: { get: function(){} } };
-window.api = wp.customize;
+window.wp = window.wp || {};
+window.wp.customize = window.wp.customize || { get: function(){}  };
 window._wpCustomizeHeader = {};
 window._wpCustomizeHeader.uploads = {
 	"cropped-abstract_00601126.jpg": {
@@ -29,18 +29,18 @@ window._wpCustomizeHeader.uploads = {
 };
 window._wpCustomizeHeader.defaults = {
 	"circle": {
-		"url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/circle.png",
-		"thumbnail_url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/circle-thumbnail.png",
+		"url": "https://dev.local/wp-content/themes/pub/twentythirteen/images/headers/circle.png",
+		"thumbnail_url": "https://dev.local/wp-content/themes/pub/twentythirteen/images/headers/circle-thumbnail.png",
 		"description": "Circle"
 	},
 	"diamond": {
-		"url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/diamond.png",
-		"thumbnail_url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/diamond-thumbnail.png",
+		"url": "https://dev.local/wp-content/themes/pub/twentythirteen/images/headers/diamond.png",
+		"thumbnail_url": "https://dev.local/wp-content/themes/pub/twentythirteen/images/headers/diamond-thumbnail.png",
 		"description": "Diamond"
 	},
 	"star": {
-		"url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/star.png",
-		"thumbnail_url": "https://sandehg.wordpress.com/wp-content/themes/pub/twentythirteen/images/headers/star-thumbnail.png",
+		"url": "https://dev.local/wp-content/themes/pub/twentythirteen/images/headers/star.png",
+		"thumbnail_url": "https://dev.local/wp-content/themes/pub/twentythirteen/images/headers/star-thumbnail.png",
 		"description": "Star"
 	}
 };

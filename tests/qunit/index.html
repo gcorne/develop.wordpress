@@ -14,20 +14,6 @@
   <script src="vendor/qunit.js"></script>
   <script src="vendor/sinon-1.8.2.js"></script>
   <script src="vendor/sinon-qunit-1.0.0.js"></script>
-
-  <!-- Fixtures -->
-  <script src="fixtures/customize-header.js"></script>
-
-  <!-- Tested files -->
-  <script src="../../src/wp-admin/js/password-strength-meter.js"></script>
-  <script src="../../src/wp-admin/js/header-models.js"></script>
-  <script src="../../src/wp-includes/js/shortcode.js"></script>
-
-  <!-- Unit tests -->
-  <script src="wp-admin/js/password-strength-meter.js"></script>
-  <script src="wp-admin/js/customize-header.js"></script>
-  <script src="wp-includes/js/shortcode.js"></script>
-
 </head>
 <body>
   <div>
@@ -35,8 +21,19 @@
     <h2 id="qunit-banner"></h2>
     <h2 id="qunit-userAgent"></h2>
     <ol id="qunit-tests"></ol>
-    <div id="qunit-fixture"></div>
+    <div id="qunit-fixture">
+      <script src="fixtures/customize-header.js"></script>
+    </div>
     <p><a href="editor">TinyMCE tests</a></p>
+    <!-- Tested files -->
+    <script src="../../src/wp-admin/js/password-strength-meter.js"></script>
+    <script src="../../src/wp-includes/js/customize-header-models.js"></script>
+    <script src="../../src/wp-includes/js/shortcode.js"></script>
+
+    <!-- Unit tests -->
+    <script src="wp-admin/js/password-strength-meter.js"></script>
+    <script src="wp-admin/js/customize-header.js"></script>
+    <script src="wp-includes/js/shortcode.js"></script>
   </div>
 </body>
 </html>

@@ -1,8 +1,9 @@
-jQuery( function() {
+/* global wp, jQuery */
 
+jQuery( function() {
 	module('Custom Header: ChoiceList', {
 		setup: function() {
-			api.HeaderTool.currentHeader = new api.HeaderTool.ImageModel();
+			wp.customize.HeaderTool.currentHeader = new wp.customize.HeaderTool.ImageModel();
 			this.apiStub = sinon.stub(wp.customize, 'get').returns('foo');
 			this.choiceList = new wp.customize.HeaderTool.ChoiceList();
 		},
@@ -22,7 +23,7 @@ jQuery( function() {
 
 	module('Custom Header: DefaultsList', {
 		setup: function() {
-			api.HeaderTool.currentHeader = new api.HeaderTool.ImageModel();
+			wp.customize.HeaderTool.currentHeader = new wp.customize.HeaderTool.ImageModel();
 			this.apiStub = sinon.stub(wp.customize, 'get').returns('foo');
 			this.choiceList = new wp.customize.HeaderTool.DefaultsList();
 		},
@@ -42,7 +43,7 @@ jQuery( function() {
 
 	module('Custom Header: HeaderImage shouldBeCropped()', {
 		setup: function() {
-			api.HeaderTool.currentHeader = new api.HeaderTool.ImageModel();
+			wp.customize.HeaderTool.currentHeader = new wp.customize.HeaderTool.ImageModel();
 			this.model = new wp.customize.HeaderTool.ImageModel();
 			this.model.set({
 				themeWidth: 1000,
