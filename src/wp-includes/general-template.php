@@ -1382,7 +1382,7 @@ function the_date_xml() {
 }
 
 /**
- * Display or Retrieve the date the current $post was written (once per date)
+ * Display or Retrieve the date the current post was written (once per date)
  *
  * Will only output the date if the current post's date is different from the
  * previous one output.
@@ -1403,14 +1403,12 @@ function the_date_xml() {
  */
 function the_date( $d = '', $before = '', $after = '', $echo = true ) {
 	global $currentday, $previousday;
-	$the_date = '';
+
 	if ( $currentday != $previousday ) {
-		$the_date .= $before;
-		$the_date .= get_the_date( $d );
-		$the_date .= $after;
+		$the_date = $before . get_the_date( $d ) . $after;
 		$previousday = $currentday;
 
-		$the_date = apply_filters('the_date', $the_date, $d, $before, $after);
+		$the_date = apply_filters( 'the_date', $the_date, $d, $before, $after );
 
 		if ( $echo )
 			echo $the_date;
@@ -1422,7 +1420,7 @@ function the_date( $d = '', $before = '', $after = '', $echo = true ) {
 }
 
 /**
- * Retrieve the date the current $post was written.
+ * Retrieve the date the current post was written.
  *
  * Unlike the_date() this function will always return the date.
  * Modify output with 'get_the_date' filter.
@@ -1430,18 +1428,17 @@ function the_date( $d = '', $before = '', $after = '', $echo = true ) {
  * @since 3.0.0
  *
  * @param string $d Optional. PHP date format defaults to the date_format option if not specified.
- * @return string|null Null if displaying, string if retrieving.
+ * @return string Date the current post was written.
  */
 function get_the_date( $d = '' ) {
 	$post = get_post();
-	$the_date = '';
 
 	if ( '' == $d )
-		$the_date .= mysql2date(get_option('date_format'), $post->post_date);
+		$the_date = mysql2date( get_option( 'date_format' ), $post->post_date );
 	else
-		$the_date .= mysql2date($d, $post->post_date);
+		$the_date = mysql2date( $d, $post->post_date );
 
-	return apply_filters('get_the_date', $the_date, $d);
+	return apply_filters( 'get_the_date', $the_date, $d );
 }
 
 /**
@@ -2193,7 +2190,6 @@ function wp_admin_css_uri( $file = 'wp-admin' ) {
  * $file is a file relative to wp-admin/ without its ".css" extension. A
  * stylesheet link to that generated URL is printed.
  *
- * @package WordPress
  * @since 2.3.0
  * @uses $wp_styles WordPress Styles Object
  *

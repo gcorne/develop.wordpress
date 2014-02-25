@@ -92,14 +92,17 @@
 /* Enable draggable on IE10 touch events until it's rolled into jQuery UI core */
 .ui-sortable,
 .ui-draggable {
+	-ms-touch-action: none;
 	touch-action: none;
 }
 
 .meta-box-sortables.ui-sortable {
+	-ms-touch-action: auto;
 	touch-action: auto;
 }
 
 .meta-box-sortables.ui-sortable .hndle {
+	-ms-touch-action: none;
 	touch-action: none;
 }
 
@@ -590,10 +593,6 @@
 	border-bottom: 1px solid #dfdfdf;
 	-webkit-box-shadow: 0 4px 4px -4px rgba( 0, 0, 0, 0.1 );
 	box-shadow: 0 4px 4px -4px rgba( 0, 0, 0, 0.1 );
-}
-
-.media-frame .media-toolbar .add-to-gallery {
-	display: none;
 }
 
 .media-frame-title h1 {
@@ -1437,7 +1436,7 @@
 	margin: 1.4em 0 0.4em;
 }
 
-.gallery-settings {
+.collection-settings {
 	overflow: hidden;
 }
 
@@ -1896,7 +1895,7 @@
 		border-top: none;
 	}
 
-	.gallery-settings h3 {
+	.collection-settings h3 {
 		margin-top: 45px;
 	}
 
