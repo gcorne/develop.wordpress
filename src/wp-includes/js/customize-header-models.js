@@ -57,7 +57,7 @@
 				dataType: 'json',
 				action: 'header_remove',
 				nonce: _wpCustomizeHeader.nonces.remove,
-				data: data
+				attachment_id: data.attachment_id
 			});
 
 			this.trigger('destroy', this, this.collection);

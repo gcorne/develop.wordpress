@@ -1187,10 +1187,9 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 * choice in the Customizer's Header tool.
 	 */
 	function ajax_header_remove() {
-		$data = $_POST['data'];
 		$this->ajax_check_permission( 'header-remove', $_POST['nonce'] );
 
-		$attachment_id = absint( $data['attachment_id'] );
+		$attachment_id = absint( $_POST['attachment_id'] );
 		if ( $attachment_id < 1 )
 			return;
 
