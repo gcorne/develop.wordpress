@@ -1166,7 +1166,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 */
 	function ajax_header_add() {
 		$data = $_POST['data'];
-		$this->ajax_check_permission( 'header-add', $_REQUEST['nonce'] );
+		$this->ajax_check_permission( 'header-add', $_POST['nonce'] );
 
 		$attachment_id = absint( $data['attachment_id'] );
 		if ( $attachment_id < 1 )
@@ -1188,7 +1188,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 */
 	function ajax_header_remove() {
 		$data = $_POST['data'];
-		$this->ajax_check_permission( 'header-remove', $_REQUEST['nonce'] );
+		$this->ajax_check_permission( 'header-remove', $_POST['nonce'] );
 
 		$attachment_id = absint( $data['attachment_id'] );
 		if ( $attachment_id < 1 )
