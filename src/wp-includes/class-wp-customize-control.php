@@ -871,51 +871,51 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 	function print_header_image_template() {
 		?>
 		<script type="text/template" id="tmpl-header-choice">
-			<% if (random) { %>
+			<# if (data.random) { #>
 
 			<div class="placeholder random">
 				<div class="inner">
 					<span><span class="dice">&#9860;</span>
 						<?php /* translators: "nImages" is a number, "type" is either "uploaded" or "suggested" */ ?>
-						<?php _e( 'Randomize <%- nImages %> <%- type %> headers' ); ?>
+						<?php _e( 'Randomize {{{data.nImages}}} {{{data.type}}} headers' ); ?>
 					</span>
 				</div>
 			</div>
 
-			<% } else { %>
+			<# } else { #>
 
-			<% if (type == 'uploaded') { %>
+			<# if (data.type == 'uploaded') { #>
 			<div class="dashicons dashicons-no close"></div>
-			<% } %>
+			<# } #>
 
-			<a href="#" class="choice thumbnail %>"
-				data-customize-image-value="<%- header.url %>"
-				data-customize-header-image-data="<%- JSON.stringify(header) %>">
-				<img src="<%- header.thumbnail_url %>">
+			<a href="#" class="choice thumbnail #>"
+				data-customize-image-value="{{{data.header.url}}}"
+				data-customize-header-image-data="{{JSON.stringify(data.header)}}">
+				<img src="{{{data.header.thumbnail_url}}}">
 			</a>
 
-			<% } %>
+			<# } #>
 		</script>
 
 		<script type="text/template" id="tmpl-header-current">
-			<% if (choice) { %>
-				<% if (random) { %>
+			<# if (data.choice) { #>
+				<# if (data.random) { #>
 
 			<div class="placeholder">
 				<div class="inner">
 					<span><span class="dice">&#9860;</span>
 						<?php /* translators: "nImages" is a number, "type" is either "uploaded" or "suggested" */ ?>
-						<?php _e( 'Randomizing <%- nImages %> <%- type %> headers' ); ?>
+						<?php _e( 'Randomizing {{{data.nImages}}} {{{data.type}}} headers' ); ?>
 					</span>
 				</div>
 			</div>
 
-				<% } else { %>
+				<# } else { #>
 
-			<img src="<%- header.thumbnail_url %>" />
+			<img src="{{{data.header.thumbnail_url}}}" />
 
-				<% } %>
-			<% } else { %>
+				<# } #>
+			<# } else { #>
 
 			<div class="placeholder">
 				<div class="inner">
@@ -925,7 +925,7 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 				</div>
 			</div>
 
-			<% } %>
+			<# } #>
 		</script>
 		<?php
 	}

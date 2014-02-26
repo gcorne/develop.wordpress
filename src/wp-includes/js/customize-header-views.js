@@ -13,10 +13,10 @@
 	 * Instantiate with model wp.customize.HeaderTool.currentHeader.
 	 *
 	 * @constructor
-	 * @augments Backbone.View
+	 * @augments wp.Backbone.View
 	 */
-	api.HeaderTool.CurrentView = Backbone.View.extend({
-		template: _.template($('#tmpl-header-current').html()),
+	api.HeaderTool.CurrentView = wp.Backbone.View.extend({
+		template: wp.template('header-current'),
 
 		initialize: function() {
 			this.listenTo(this.model, 'change', this.render);
@@ -90,12 +90,12 @@
 	 * `select` method.
 	 *
 	 * @constructor
-	 * @augments Backbone.View
+	 * @augments wp.Backbone.View
 	 */
 	(function () { // closures FTW
 	var lastHeight = 0;
-	api.HeaderTool.ChoiceView = Backbone.View.extend({
-		template: _.template($('#tmpl-header-choice').html()),
+	api.HeaderTool.ChoiceView = wp.Backbone.View.extend({
+		template: wp.template('header-choice'),
 
 		className: 'header-view',
 
@@ -171,9 +171,9 @@
 	 * Takes a wp.customize.HeaderTool.ChoiceList.
 	 *
 	 * @constructor
-	 * @augments Backbone.View
+	 * @augments wp.Backbone.View
 	 */
-	api.HeaderTool.ChoiceListView = Backbone.View.extend({
+	api.HeaderTool.ChoiceListView = wp.Backbone.View.extend({
 		initialize: function() {
 			this.listenTo(this.collection, 'add', this.addOne);
 			this.listenTo(this.collection, 'remove', this.render);
@@ -214,9 +214,9 @@
 	 * Backbone object, really) and acts as a bus to feed them events.
 	 *
 	 * @constructor
-	 * @augments Backbone.View
+	 * @augments wp.Backbone.View
 	 */
-	api.HeaderTool.CombinedList = Backbone.View.extend({
+	api.HeaderTool.CombinedList = wp.Backbone.View.extend({
 		initialize: function(collections) {
 			this.collections = collections;
 			this.on('all', this.propagate, this);
