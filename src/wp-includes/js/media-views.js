@@ -462,12 +462,14 @@
 					menuItem = { text: title };
 				}
 
-				if ( priority )
+				if ( priority ) {
 					menuItem.priority = priority;
+				}
 			}
 
-			if ( ! menuItem )
+			if ( ! menuItem ) {
 				return;
+			}
 
 			view.set( this.id, menuItem );
 			}
