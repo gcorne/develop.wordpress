@@ -1106,8 +1106,10 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 		return $attachment_id;
 	}
 
-	function ajax_check_nonce( $nonce, $attachment_id = null ) {
-		if ( ! isset( $nonce ) || ! wp_verify_nonce( $nonce,  'crop-image_' . $attachment_id ) ) {
+	function ajax_check_permission( $name, $nonce, $attachment_id = null ) {
+		$name = $attachment_id === null ? $name : "${name}_${attachment_id}";
+		if ( ! isset( $nonce ) || ! wp_verify_nonce( $nonce, $name ) ||
+					! current_user_can('edit_theme_options') ) {
 			wp_die( __( 'Cheatin&#8217; uh?' ) );
 		}
 	}
@@ -1118,7 +1120,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 */
 	function ajax_header_crop() {
 		$data = $_POST['data'];
-		$this->ajax_check_nonce( $data['nonces']['crop'], $data['id'] );
+		$this->ajax_check_permission( 'crop-image', $data['nonces']['crop'], $data['id'] );
 		if ( ! current_theme_supports( 'custom-header', 'uploads' ) )
 			wp_die( __( 'Cheatin&#8217; uh?' ) );
 
@@ -1164,7 +1166,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 */
 	function ajax_header_add() {
 		$data = $_POST['data'];
-		check_ajax_referer( 'header-add', 'nonce' );
+		$this->ajax_check_permission( 'header-add', $_REQUEST['nonce'] );
 
 		$attachment_id = absint( $data['attachment_id'] );
 		if ( $attachment_id < 1 )
@@ -1186,7 +1188,7 @@ wp_nonce_field( 'custom-header-options', '_wpnonce-custom-header-options' ); ?>
 	 */
 	function ajax_header_remove() {
 		$data = $_POST['data'];
-		check_ajax_referer( 'header-remove', 'nonce' );
+		$this->ajax_check_permission( 'header-remove', $_REQUEST['nonce'] );
 
 		$attachment_id = absint( $data['attachment_id'] );
 		if ( $attachment_id < 1 )
