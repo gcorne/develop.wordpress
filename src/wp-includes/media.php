@@ -762,9 +762,12 @@ add_shortcode('gallery', 'gallery_shortcode');
  *     @type string $orderby    The field to use when ordering the images. Default 'menu_order ID'.
  *                              Accepts any valid SQL ORDERBY statement.
  *     @type int    $id         Post ID.
- *     @type string $itemtag    HTML tag to use for each image in the gallery. Default 'dl'.
- *     @type string $icontag    HTML tag to use for each image's icon. Default 'dt'.
- *     @type string $captiontag HTML tag to use for each image's caption. Default 'dd'.
+ *     @type string $itemtag    HTML tag to use for each image in the gallery.
+ *                              Default 'dl', or 'figure' when the theme registers HTML5 gallery support.
+ *     @type string $icontag    HTML tag to use for each image's icon.
+ *                              Default 'dt', or 'div' when the theme registers HTML5 gallery support.
+ *     @type string $captiontag HTML tag to use for each image's caption.
+ *                              Default 'dd', or 'figcaption' when the theme registers HTML5 gallery support.
  *     @type int    $columns    Number of columns of images to display. Default 3.
  *     @type string $size       Size of the images to display. Default 'thumbnail'.
  *     @type string $ids        A comma-separated list of IDs of attachments to display. Default empty.
@@ -812,13 +815,14 @@ function gallery_shortcode( $attr ) {
 			unset( $attr['orderby'] );
 	}
 
+	$html5 = current_theme_supports( 'html5', 'gallery' );
 	extract(shortcode_atts(array(
 		'order'      => 'ASC',
 		'orderby'    => 'menu_order ID',
 		'id'         => $post ? $post->ID : 0,
-		'itemtag'    => 'dl',
-		'icontag'    => 'dt',
-		'captiontag' => 'dd',
+		'itemtag'    => $html5 ? 'figure'     : 'dl',
+		'icontag'    => $html5 ? 'div'        : 'dt',
+		'captiontag' => $html5 ? 'figcaption' : 'dd',
 		'columns'    => 3,
 		'size'       => 'thumbnail',
 		'include'    => '',
@@ -1009,6 +1013,10 @@ function wp_get_playlist( $attr, $type ) {
 		$orderby = 'none';
 	}
 
+	if ( ! in_array( $style, array( 'light', 'dark' ), true ) ) {
+		$style = 'light';
+	}
+
 	$args = array(
 		'post_status' => 'inherit',
 		'post_type' => 'attachment',
@@ -1109,13 +1117,16 @@ function wp_get_playlist( $attr, $type ) {
 	}
 	$data['tracks'] = $tracks;
 
+	$safe_type = esc_attr( $safe_type );
+	$safe_style = esc_attr( $style );
+
 	ob_start();
 
 	if ( 1 === $instance ):
 		wp_enqueue_style( 'wp-mediaelement' );
 		wp_enqueue_script( 'wp-playlist' );
 ?>
-<!--[if lt IE 9]><script>document.createElement('<?php echo $type ?>');</script><![endif]-->
+<!--[if lt IE 9]><script>document.createElement('<?php echo esc_js( $type ) ?>');</script><![endif]-->
 <script type="text/html" id="tmpl-wp-playlist-current-item">
 	<# if ( data.image ) { #>
 	<img src="{{{ data.thumb.src }}}"/>
@@ -1127,7 +1138,7 @@ function wp_get_playlist( $attr, $type ) {
 		<span class="wp-caption-meta wp-caption-artist">{{{ data.meta.artist }}}</span>
 	</div>
 	<# } else { #>
-	<div class="wp-playlist-caption">{{{ data.caption }}}</div>
+	<div class="wp-playlist-caption">{{{ data.caption ? data.caption : data.title }}}</div>
 	<# } #>
 </script>
 <script type="text/html" id="tmpl-wp-playlist-item">
@@ -1150,11 +1161,11 @@ function wp_get_playlist( $attr, $type ) {
 	</div>
 </script>
 	<?php endif ?>
-<div class="wp-playlist wp-<?php echo $type ?>-playlist wp-playlist-<?php echo $style ?>">
+<div class="wp-playlist wp-<?php echo $safe_type ?>-playlist wp-playlist-<?php echo $safe_style ?>">
 	<?php if ( 'audio' === $type ): ?>
 	<div class="wp-playlist-current-item"></div>
 	<?php endif ?>
-	<<?php echo $type ?> controls="controls" preload="metadata" width="<?php echo $theme_width ?>"></<?php echo $type ?>>
+	<<?php echo $safe_type ?> controls="controls" preload="metadata" width="<?php echo (int) $theme_width ?>"></<?php echo $safe_type ?>>
 	<div class="wp-playlist-next"></div>
 	<div class="wp-playlist-prev"></div>
 	<noscript>

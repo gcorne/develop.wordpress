@@ -220,15 +220,14 @@ module.exports = function(grunt) {
 					'wp-includes/js/tinymce/plugins/wp*/plugin.js',
 					// Third party scripts
 					'!wp-admin/js/farbtastic.js',
-					'!wp-admin/js/iris.min.js',
 					'!wp-includes/js/backbone*.js',
 					'!wp-includes/js/swfobject.js',
 					'!wp-includes/js/underscore*.js',
-					'!wp-includes/js/zxcvbn.min.js',
 					'!wp-includes/js/colorpicker.js',
 					'!wp-includes/js/hoverIntent.js',
 					'!wp-includes/js/json2.js',
-					'!wp-includes/js/tw-sack.js'
+					'!wp-includes/js/tw-sack.js',
+					'!**/*.min.js'
 				],
 				// Remove once other JSHint errors are resolved
 				options: {
@@ -427,6 +426,9 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('test', 'Runs all QUnit and PHPUnit tasks.', ['qunit:compiled', 'phpunit']);
 	grunt.registerTask('travis', ['jshint', 'test']);
+
+	// Patch task.
+	grunt.renameTask('patch_wordpress', 'patch');
 
 	// Default task.
 	grunt.registerTask('default', ['build']);
