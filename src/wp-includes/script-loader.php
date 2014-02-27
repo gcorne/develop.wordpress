@@ -381,8 +381,8 @@ function wp_default_scripts( &$scripts ) {
 		'allowedFiles' => __( 'Allowed Files' ),
 	) );
 
-	$scripts->add( 'customize-header-models',  "/wp-includes/js/customize-header-models.js",  array( 'underscore', 'backbone' ), false, 1 );
-	$scripts->add( 'customize-header-views',  "/wp-includes/js/customize-header-views.js",  array( 'jquery', 'underscore', 'imgareaselect', 'customize-header-models' ), false, 1 );
+	$scripts->add( 'customize-models',  "/wp-includes/js/customize-models.js",  array( 'underscore', 'backbone' ), false, 1 );
+	$scripts->add( 'customize-views',  "/wp-includes/js/customize-views.js",  array( 'jquery', 'underscore', 'imgareaselect', 'customize-models' ), false, 1 );
 
 	$scripts->add( 'accordion', "/wp-admin/js/accordion$suffix.js", array( 'jquery' ), false, 1 );
 

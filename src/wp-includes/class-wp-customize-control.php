@@ -715,11 +715,11 @@ class WP_Customize_Header_Image_Control extends WP_Customize_Control {
 
 	public function enqueue() {
 		wp_enqueue_media();
-		wp_enqueue_script( 'customize-header-views' );
+		wp_enqueue_script( 'customize-views' );
 
 		$this->prepare_control();
 
-		wp_localize_script( 'customize-header-views', '_wpCustomizeHeader', array(
+		wp_localize_script( 'customize-views', '_wpCustomizeHeader', array(
 			'data' => array(
 				'width' => absint( get_theme_support( 'custom-header', 'width' ) ),
 				'height' => absint( get_theme_support( 'custom-header', 'height' ) ),
