@@ -212,7 +212,7 @@
 			props = wp.media.string.props( props, attachment );
 			classes = props.classes || [];
 
-			img.src = typeof attachment !== 'undefined' ? attachment.url : props.url;
+			img.src = ! _.isUndefined( attachment ) ? attachment.url : props.url;
 			_.extend( img, _.pick( props, 'width', 'height', 'alt' ) );
 
 			// Only assign the align class to the image if we're not printing
@@ -278,8 +278,17 @@
 		var collections = {};
 
 		return _.extend( attributes, {
+			/**
+			 * A helper function to avoid truthy and falsey values being
+			 *   passed as an input that expects booleans. If key is undefined in the map,
+			 *   but has a default value, set it.
+			 *
+			 * @param {object} attrs Map of props from a shortcode or settings.
+			 * @param {string} key The key within the passed map to check for a value.
+			 * @returns {mixed|undefined} The original or coerced value of key within attrs
+			 */
 			coerce: function ( attrs, key ) {
-				if ( 'undefined' === typeof attrs[ key ] && 'undefined' !== typeof this.defaults[ key ] ) {
+				if ( _.isUndefined( attrs[ key ] ) && ! _.isUndefined( this.defaults[ key ] ) ) {
 					attrs[ key ] = this.defaults[ key ];
 				} else if ( 'true' === attrs[ key ] ) {
 					attrs[ key ] = true;
@@ -288,7 +297,17 @@
 				}
 				return attrs[ key ];
 			},
-
+			/**
+			 * Retrieve attachments based on the properties of the passed shortcode
+			 *
+			 * @global wp.media.query
+			 *
+			 * @param {wp.shortcode} shortcode An instance of wp.shortcode().
+			 * @returns {wp.media.model.Attachments} A Backbone.Collection containing
+			 *      the media items belonging to a collection.
+			 *      The query[ this.tag ] property is a Backbone.Model
+			 *          containing the 'props' for the collection.
+			 */
 			attachments: function( shortcode ) {
 				var shortcodeString = shortcode.string(),
 					result = collections[ shortcodeString ],
@@ -338,7 +357,6 @@
 				// Collect the attributes that were not included in `args`.
 				others = _.omit( attrs, 'id', 'ids', 'include', 'exclude', 'orderby', 'order' );
 
-				// Remove default attributes from the shortcode.
 				_.each( this.defaults, function( value, key ) {
 					others[ key ] = self.coerce( others, key );
 				});
@@ -347,7 +365,18 @@
 				query[ this.tag ] = new Backbone.Model( others );
 				return query;
 			},
-
+			/**
+			 * Triggered when clicking 'Insert {label}' or 'Update {label}'
+			 *
+			 * @global wp.shortcode
+			 * @global wp.media.model.Attachments
+			 *
+			 * @param {wp.media.model.Attachments} attachments A Backbone.Collection containing
+			 *      the media items belonging to a collection.
+			 *      The query[ this.tag ] property is a Backbone.Model
+			 *          containing the 'props' for the collection.
+			 * @returns {wp.shortcode}
+			 */
 			shortcode: function( attachments ) {
 				var props = attachments.props.toJSON(),
 					attrs = _.pick( props, 'orderby', 'order' ),
@@ -406,7 +435,21 @@
 
 				return shortcode;
 			},
-
+			/**
+			 * Triggered when double-clicking a collection shortcode placeholder
+			 *   in the editor
+			 *
+			 * @global wp.shortcode
+			 * @global wp.media.model.Selection
+			 * @global wp.media.view.l10n
+			 *
+			 * @param {string} content Content that is searched for possible
+			 *    shortcode markup matching the passed tag name,
+			 *
+			 * @this wp.media.{prop}
+			 *
+			 * @returns {wp.media.view.MediaFrame.Select} A media workflow.
+			 */
 			edit: function( content ) {
 				var shortcode = wp.shortcode.next( this.tag, content ),
 					defaultPostId = this.defaults.id,
@@ -633,8 +676,8 @@
 		 */
 		insert: function( html ) {
 			var editor,
-				hasTinymce = typeof tinymce !== 'undefined',
-				hasQuicktags = typeof QTags !== 'undefined',
+				hasTinymce = ! _.isUndefined( window.tinymce ),
+				hasQuicktags = ! _.isUndefined( window.QTags ),
 				wpActiveEditor = window.wpActiveEditor;
 
 			// Delegate to the global `send_to_editor` if it exists.
@@ -799,7 +842,7 @@
 			id = wpActiveEditor;
 
 			// If that doesn't work, fall back to `tinymce.activeEditor.id`.
-			if ( ! id && typeof tinymce !== 'undefined' && tinymce.activeEditor ) {
+			if ( ! id && ! _.isUndefined( window.tinymce ) && tinymce.activeEditor ) {
 				id = tinymce.activeEditor.id;
 			}
 
@@ -930,7 +973,7 @@
 			id = this.id( id );
 /*
 			// Save a bookmark of the caret position in IE.
-			if ( typeof tinymce !== 'undefined' ) {
+			if ( ! _.isUndefined( window.tinymce ) ) {
 				editor = tinymce.get( id );
 
 				if ( tinymce.isIE && editor && ! editor.isHidden() ) {
