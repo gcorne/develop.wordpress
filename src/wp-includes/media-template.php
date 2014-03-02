@@ -99,13 +99,6 @@ function wp_print_media_templates() {
 					printf( __( 'Maximum upload file size: %d%s.' ), esc_html($upload_size_unit), esc_html($byte_sizes[$u]) );
 				?></p>
 
-				<?php if ( ( $GLOBALS['is_IE'] || $GLOBALS['is_opera']) && $max_upload_size > 100 * 1024 * 1024 ) :
-					$browser_uploader = admin_url( 'media-new.php?browser-uploader&post_id=' ) . '{{ data.postId }}';
-					?>
-					<p class="big-file-warning"><?php printf( __( 'Your browser has some limitations uploading large files with the multi-file uploader. Please use the <a href="%1$s" target="%2$s">browser uploader</a> for files over 100MB.' ),
-						$browser_uploader, '_blank' ); ?></p>
-				<?php endif; ?>
-
 				<?php
 				/** This action is documented in wp-admin/includes/media.php */
 				do_action( 'post-upload-ui' ); ?>
@@ -408,6 +401,58 @@ function wp_print_media_templates() {
 		<label class="setting">
 			<span><?php _e( 'Random Order' ); ?></span>
 			<input type="checkbox" data-setting="_orderbyRandom" />
+		</label>
+	</script>
+
+	<script type="text/html" id="tmpl-playlist-settings">
+		<h3><?php _e( 'Playlist Settings' ); ?></h3>
+
+		<label class="setting">
+			<span><?php _e( 'Random Order' ); ?></span>
+			<input type="checkbox" data-setting="_orderbyRandom" />
+		</label>
+
+		<label class="setting">
+			<span><?php _e( 'Style' ); ?></span>
+			<select class="style" data-setting="style">
+				<option value="light">
+					<?php esc_attr_e( 'Light' ); ?>
+				</option>
+				<option value="dark">
+					<?php esc_attr_e( 'Dark' ); ?>
+				</option>
+			</select>
+		</label>
+
+		<#
+			var playlist = 'playlist-edit' === data.controller.id, emptyModel = _.isEmpty(data.model);
+		#>
+		<label class="setting">
+			<span><?php _e( 'Show Tracklist' ); ?></span>
+			<input type="checkbox" data-setting="tracklist" <# if ( playlist && emptyModel ) { #>
+				checked="checked"
+			<# } #> />
+		</label>
+
+		<label class="setting">
+			<span><?php _e( 'Show Track Numbers' ); ?></span>
+			<input type="checkbox" data-setting="tracknumbers" <# if ( playlist && emptyModel ) { #>
+				checked="checked"
+			<# } #> />
+		</label>
+
+		<label class="setting">
+			<span><?php _e( 'Show Artist Name in Tracklist' ); ?></span>
+			<input type="checkbox" data-setting="artists" <# if ( playlist && emptyModel ) { #>
+				checked="checked"
+			<# } #> />
+		</label>
+
+		<label class="setting">
+			<span><?php _e( 'Show Images' ); ?></span>
+			<input type="checkbox" data-setting="images" <# if ( emptyModel ) { #>
+				checked="checked"
+			<# } #> />
 		</label>
 	</script>
 

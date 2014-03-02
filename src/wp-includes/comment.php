@@ -280,7 +280,7 @@ class WP_Comment_Query {
 		$key = md5( serialize( compact(array_keys($defaults)) )  );
 		$last_changed = wp_cache_get( 'last_changed', 'comment' );
 		if ( ! $last_changed ) {
-			$last_changed = microtime( true );
+			$last_changed = microtime();
 			wp_cache_set( 'last_changed', $last_changed, 'comment' );
 		}
 		$cache_key = "get_comments:$key:$last_changed";
@@ -373,8 +373,13 @@ class WP_Comment_Query {
 		}
 		if ( '' !== $parent )
 			$where .= $wpdb->prepare( ' AND comment_parent = %d', $parent );
-		if ( '' !== $user_id )
+
+		if ( is_array( $user_id ) ) {
+			$where .= ' AND user_id IN (' . implode( ',', array_map( 'absint', $user_id ) ) . ')';
+		} elseif ( '' !== $user_id ) {
 			$where .= $wpdb->prepare( ' AND user_id = %d', $user_id );
+		}
+
 		if ( '' !== $search )
 			$where .= $this->get_search_sql( $search, array( 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_author_IP', 'comment_content' ) );
 
@@ -461,8 +466,6 @@ class WP_Comment_Query {
  * Comments have a limited set of valid status values, this provides the comment
  * status values and descriptions.
  *
- * @package WordPress
- * @subpackage Post
  * @since 2.7.0
  *
  * @return array List of comment statuses.
@@ -648,7 +651,7 @@ function get_comment_meta($comment_id, $key = '', $single = false) {
  * @param string $meta_key Metadata key.
  * @param mixed $meta_value Metadata value.
  * @param mixed $prev_value Optional. Previous value to check before removing.
- * @return bool True on success, false on failure.
+ * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
  */
 function update_comment_meta($comment_id, $meta_key, $meta_value, $prev_value = '') {
 	return update_metadata('comment', $comment_id, $meta_key, $meta_value, $prev_value);
@@ -1560,7 +1563,7 @@ function wp_insert_comment($commentdata) {
 	 */
 	do_action( 'wp_insert_comment', $id, $comment );
 
-	wp_cache_set( 'last_changed', microtime( true ), 'comment' );
+	wp_cache_set( 'last_changed', microtime(), 'comment' );
 
 	return $id;
 }
@@ -2351,8 +2354,6 @@ function xmlrpc_pingback_error( $ixr_error ) {
  * Removes comment ID from the comment cache.
  *
  * @since 2.3.0
- * @package WordPress
- * @subpackage Cache
  *
  * @param int|array $ids Comment ID or array of comment IDs to remove from cache
  */
@@ -2360,7 +2361,7 @@ function clean_comment_cache($ids) {
 	foreach ( (array) $ids as $id )
 		wp_cache_delete($id, 'comment');
 
-	wp_cache_set( 'last_changed', microtime( true ), 'comment' );
+	wp_cache_set( 'last_changed', microtime(), 'comment' );
 }
 
 /**
@@ -2371,8 +2372,6 @@ function clean_comment_cache($ids) {
  * cache using the comment group with the key using the ID of the comments.
  *
  * @since 2.3.0
- * @package WordPress
- * @subpackage Cache
  *
  * @param array $comments Array of comment row objects
  */

@@ -177,13 +177,13 @@ function validate_file_to_edit( $file, $allowed_files = '' ) {
 
 	switch ( $code ) {
 		case 1 :
-			wp_die( __('Sorry, can&#8217;t edit files with &#8220;..&#8221; in the name. If you are trying to edit a file in your WordPress home directory, you can just type the name of the file in.' ));
+			wp_die( __( 'Sorry, that file cannot be edited.' ) );
 
 		//case 2 :
 		//	wp_die( __('Sorry, can&#8217;t call files with their real path.' ));
 
 		case 3 :
-			wp_die( __('Sorry, that file cannot be edited.' ));
+			wp_die( __( 'Sorry, that file cannot be edited.' ) );
 	}
 }
 
@@ -258,8 +258,9 @@ function wp_handle_upload( &$file, $overrides = false, $time = null ) {
 		return call_user_func($upload_error_handler, $file, __( 'Invalid form submission.' ));
 
 	// A successful upload will pass this test. It makes no sense to override this one.
-	if ( $file['error'] > 0 )
-		return call_user_func($upload_error_handler, $file, $upload_error_strings[$file['error']] );
+	if ( isset( $file['error'] ) && $file['error'] > 0 ) {
+		return call_user_func( $upload_error_handler, $file, $upload_error_strings[ $file['error'] ] );
+	}
 
 	// A non-empty file will pass this test.
 	if ( $test_size && !($file['size'] > 0 ) ) {

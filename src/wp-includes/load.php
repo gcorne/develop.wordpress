@@ -107,7 +107,7 @@ function wp_check_php_mysql_versions() {
 		die( sprintf( __( 'Your server is running PHP version %1$s but WordPress %2$s requires at least %3$s.' ), $php_version, $wp_version, $required_php_version ) );
 	}
 
-	if ( ! extension_loaded( 'mysql' ) && ! file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
+	if ( ! extension_loaded( 'mysql' ) && ! extension_loaded( 'mysqli' ) && ! file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
 		wp_load_translations_early();
 		die( __( 'Your PHP installation appears to be missing the MySQL extension which is required by WordPress.' ) );
 	}
@@ -217,7 +217,7 @@ function timer_start() {
  *
  * @param int $display Use '0' or null to not echo anything and 1 to echo the total time
  * @param int $precision The amount of digits from the right of the decimal to display. Default is 3.
- * @return float The "second.microsecond" finished time calculation
+ * @return string The "second.microsecond" finished time calculation. The number is formatted for human consumption, it is both localized and rounded.
  */
 function timer_stop( $display = 0, $precision = 3 ) { // if called like timer_stop(1), will echo $timetotal
 	global $timestart, $timeend;

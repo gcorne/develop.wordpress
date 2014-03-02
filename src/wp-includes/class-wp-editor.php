@@ -324,8 +324,8 @@ final class _WP_Editors {
 					'keep_styles' => false,
 					'paste_remove_styles' => true,
 
-					// limit the preview styles in the menu/toolbar
-			//		'preview_styles' => 'font-family font-weight font-style text-decoration text-transform color background-color border',
+					// Limit the preview styles in the menu/toolbar
+					'preview_styles' => 'font-family font-size font-weight font-style text-decoration text-transform',
 
 					'wpeditimage_disable_captions' => $no_captions,
 					'plugins' => implode( ',', $plugins ),
@@ -804,12 +804,6 @@ final class _WP_Editors {
 			var init, edId, qtId, firstInit, override,
 				loadMCE = typeof getUserSetting !== 'undefined' ? getUserSetting( 'editor' ) === 'tinymce' : true;
 
-			if ( typeof quicktags !== 'undefined' ) {
-				for ( qtId in tinyMCEPreInit.qtInit ) {
-					try { quicktags( tinyMCEPreInit.qtInit[qtId] ); } catch(e){};
-				}
-			}
-
 			if ( typeof tinymce !== 'undefined' ) {
 				for ( edId in tinyMCEPreInit.mceInit ) {
 					if ( firstInit ) {
@@ -822,8 +816,26 @@ final class _WP_Editors {
 					override = override || ! tinyMCEPreInit.qtInit.hasOwnProperty( edId );
 
 					if ( ( loadMCE || override ) && ! init.wp_skip_init ) {
-						try { tinymce.init( init ); } catch(e){}
+						try {
+							tinymce.init( init );
+
+							if ( ! window.wpActiveEditor ) {
+								window.wpActiveEditor = edId;
+							}
+						} catch(e){}
 					}
+				}
+			}
+
+			if ( typeof quicktags !== 'undefined' ) {
+				for ( qtId in tinyMCEPreInit.qtInit ) {
+					try {
+						quicktags( tinyMCEPreInit.qtInit[qtId] );
+
+						if ( ! window.wpActiveEditor ) {
+							window.wpActiveEditor = qtId;
+						}
+					} catch(e){};
 				}
 			}
 

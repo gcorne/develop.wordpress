@@ -11,6 +11,7 @@ require_once( dirname( __FILE__ ) . '/admin.php' );
 
 wp_enqueue_style( 'plugin-install' );
 wp_enqueue_script( 'plugin-install' );
+wp_enqueue_script( 'updates' );
 add_thickbox();
 
 if ( is_multisite() && ! is_network_admin() ) {
@@ -457,7 +458,7 @@ if ( ( 'do-theme-upgrade' == $action || ( 'do-plugin-upgrade' == $action && ! is
 }
 
 $title = __('WordPress Updates');
-$parent_file = 'tools.php';
+$parent_file = 'index.php';
 
 $updates_overview  = '<p>' . __( 'On this screen, you can update to the latest version of WordPress, as well as update your themes and plugins from the WordPress.org repositories.' ) . '</p>';
 $updates_overview .= '<p>' . __( 'If an update is available, you&#8127;ll see a notification appear in the Toolbar and navigation menu.' ) . ' ' . __( 'Keeping your site updated is important for security. It also makes the internet a safer place for you and your readers.' ) . '</p>';

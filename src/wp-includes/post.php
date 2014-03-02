@@ -876,8 +876,6 @@ function get_page_statuses() {
  *
  * Arguments prefixed with an _underscore shouldn't be used by plugins and themes.
  *
- * @package WordPress
- * @subpackage Post
  * @since 3.0.0
  * @uses $wp_post_statuses Inserts new post status object into the list
  *
@@ -951,8 +949,6 @@ function register_post_status($post_status, $args = array()) {
 /**
  * Retrieve a post status object by name
  *
- * @package WordPress
- * @subpackage Post
  * @since 3.0.0
  * @uses $wp_post_statuses
  * @see register_post_status
@@ -973,8 +969,6 @@ function get_post_status_object( $post_status ) {
 /**
  * Get a list of all registered post status objects.
  *
- * @package WordPress
- * @subpackage Post
  * @since 3.0.0
  * @uses $wp_post_statuses
  * @see register_post_status
@@ -1044,8 +1038,6 @@ function get_post_type( $post = null ) {
 /**
  * Retrieve a post type object by name
  *
- * @package WordPress
- * @subpackage Post
  * @since 3.0.0
  * @uses $wp_post_types
  * @see register_post_type
@@ -1066,8 +1058,6 @@ function get_post_type_object( $post_type ) {
 /**
  * Get a list of all registered post type objects.
  *
- * @package WordPress
- * @subpackage Post
  * @since 2.9.0
  * @uses $wp_post_types
  * @see register_post_type
@@ -1789,7 +1779,7 @@ function get_post_meta($post_id, $key = '', $single = false) {
  * @param string $meta_key Metadata key.
  * @param mixed $meta_value Metadata value. Must be serializable if non-scalar.
  * @param mixed $prev_value Optional. Previous value to check before removing.
- * @return bool True on success, false on failure.
+ * @return int|bool Meta ID if the key didn't exist, true on successful update, false on failure.
  */
 function update_post_meta($post_id, $meta_key, $meta_value, $prev_value = '') {
 	// make sure meta is added to the post, not a revision
@@ -2601,8 +2591,6 @@ function wp_get_post_categories( $post_id = 0, $args = array() ) {
  * is set to 'all'. There are other defaults that can be overridden in
  * {@link wp_get_object_terms()}.
  *
- * @package WordPress
- * @subpackage Post
  * @since 2.3.0
  *
  * @uses wp_get_object_terms() Gets the tags for returning. Args can be found here
@@ -2622,8 +2610,6 @@ function wp_get_post_tags( $post_id = 0, $args = array() ) {
  * is set to 'all'. There are other defaults that can be overridden in
  * {@link wp_get_object_terms()}.
  *
- * @package WordPress
- * @subpackage Post
  * @since 2.8.0
  *
  * @uses wp_get_object_terms() Gets the tags for returning. Args can be found here
@@ -3215,8 +3201,6 @@ function _truncate_post_slug( $slug, $length = 200 ) {
  *
  * @uses wp_set_post_tags() Same first two parameters, but the last parameter is always set to true.
  *
- * @package WordPress
- * @subpackage Post
  * @since 2.3.0
  *
  * @param int $post_id Post ID
@@ -3749,7 +3733,7 @@ function get_pages( $args = array() ) {
 	$key = md5( serialize( compact(array_keys($defaults)) ) );
 	$last_changed = wp_cache_get( 'last_changed', 'posts' );
 	if ( ! $last_changed ) {
-		$last_changed = microtime( true );
+		$last_changed = microtime();
 		wp_cache_set( 'last_changed', $last_changed, 'posts' );
 	}
 
@@ -4716,8 +4700,6 @@ function _get_last_post_time( $timezone, $field ) {
 /**
  * Updates posts in cache.
  *
- * @package WordPress
- * @subpackage Cache
  * @since 1.5.1
  *
  * @param array $posts Array of post objects
@@ -4739,8 +4721,6 @@ function update_post_cache( &$posts ) {
  * This function not run if $_wp_suspend_cache_invalidation is not empty. See
  * wp_suspend_cache_invalidation().
  *
- * @package WordPress
- * @subpackage Cache
  * @since 2.0.0
  *
  * @uses do_action() Calls 'clean_post_cache' on $id before adding children (if any).
@@ -4774,14 +4754,12 @@ function clean_post_cache( $post ) {
 		do_action( 'clean_page_cache', $post->ID );
 	}
 
-	wp_cache_set( 'last_changed', microtime( true ), 'posts' );
+	wp_cache_set( 'last_changed', microtime(), 'posts' );
 }
 
 /**
  * Call major cache updating functions for list of Post objects.
  *
- * @package WordPress
- * @subpackage Cache
  * @since 1.5.0
  *
  * @uses update_post_cache()
@@ -4834,8 +4812,6 @@ function update_post_caches(&$posts, $post_type = 'post', $update_term_cache = t
  * metadata cache for the posts. Therefore, the functions, which call this
  * function, do not need to perform SQL queries on their own.
  *
- * @package WordPress
- * @subpackage Cache
  * @since 2.1.0
  *
  * @param array $post_ids List of post IDs.
@@ -4854,8 +4830,6 @@ function update_postmeta_cache($post_ids) {
  * This function will not run if $_wp_suspend_cache_invalidation is not empty. See
  * wp_suspend_cache_invalidation().
  *
- * @package WordPress
- * @subpackage Cache
  * @since 3.0.0
  *
  * @uses do_action() Calls 'clean_attachment_cache' on $id.

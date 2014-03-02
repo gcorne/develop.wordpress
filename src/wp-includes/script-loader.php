@@ -197,7 +197,11 @@ function wp_default_scripts( &$scripts ) {
 	$scripts->add( 'jquery-hotkeys', "/wp-includes/js/jquery/jquery.hotkeys$suffix.js", array('jquery'), '0.0.2m', 1 );
 	$scripts->add( 'jquery-table-hotkeys', "/wp-includes/js/jquery/jquery.table-hotkeys$suffix.js", array('jquery', 'jquery-hotkeys'), false, 1 );
 	$scripts->add( 'jquery-touch-punch', "/wp-includes/js/jquery/jquery.ui.touch-punch.js", array('jquery-ui-widget', 'jquery-ui-mouse'), '0.2.2', 1 );
-	$scripts->add( 'jquery-masonry', "/wp-includes/js/jquery/jquery.masonry.min.js", array('jquery'), '2.1.05', 1 );
+
+	// Masonry v2 depended on jQuery. v3 does not. The older jquery-masonry handle is a shiv.
+	// It sets jQuery as a dependency, as the theme may have been implicitly loading it this way.
+	$scripts->add( 'masonry', "/wp-includes/js/masonry.min.js", array(), '3.1.2', 1 );
+	$scripts->add( 'jquery-masonry', "/wp-includes/js/jquery/jquery.masonry$suffix.js", array( 'jquery', 'masonry' ), '3.1.2', 1 );
 
 	$scripts->add( 'thickbox', "/wp-includes/js/thickbox/thickbox.js", array('jquery'), '3.1-20121105', 1 );
 	did_action( 'init' ) && $scripts->localize( 'thickbox', 'thickboxL10n', array(
@@ -246,14 +250,9 @@ function wp_default_scripts( &$scripts ) {
 		'error_uploading' => __('&#8220;%s&#8221; has failed to upload.')
 	);
 
-	$scripts->add( 'plupload', '/wp-includes/js/plupload/plupload.js', array(), '1.5.7' );
-	$scripts->add( 'plupload-html5', '/wp-includes/js/plupload/plupload.html5.js', array('plupload'), '1.5.7' );
-	$scripts->add( 'plupload-flash', '/wp-includes/js/plupload/plupload.flash.js', array('plupload'), '1.5.7' );
-	$scripts->add( 'plupload-silverlight', '/wp-includes/js/plupload/plupload.silverlight.js', array('plupload'), '1.5.7' );
-	$scripts->add( 'plupload-html4', '/wp-includes/js/plupload/plupload.html4.js', array('plupload'), '1.5.7' );
-
-	// cannot use the plupload.full.js, as it loads browserplus init JS from Yahoo
-	$scripts->add( 'plupload-all', false, array('plupload', 'plupload-html5', 'plupload-flash', 'plupload-silverlight', 'plupload-html4'), '1.5.7' );
+	// Back compat
+	$scripts->add( 'plupload', '/wp-includes/js/plupload/plupload.full.min.js', array(), '2.1.1' );
+	$scripts->add( 'plupload-all', '/wp-includes/js/plupload/plupload.full.min.js', array(), '2.1.1' );
 
 	$scripts->add( 'plupload-handlers', "/wp-includes/js/plupload/handlers$suffix.js", array('plupload-all', 'jquery') );
 	did_action( 'init' ) && $scripts->localize( 'plupload-handlers', 'pluploadL10n', $uploader_l10n );
@@ -270,12 +269,12 @@ function wp_default_scripts( &$scripts ) {
 	$scripts->add( 'swfupload-handlers', "/wp-includes/js/swfupload/handlers$suffix.js", array('swfupload-all', 'jquery'), '2201-20110524');
 	did_action( 'init' ) && $scripts->localize( 'swfupload-handlers', 'swfuploadL10n', $uploader_l10n );
 
-	$scripts->add( 'comment-reply', "/wp-includes/js/comment-reply$suffix.js" );
+	$scripts->add( 'comment-reply', "/wp-includes/js/comment-reply$suffix.js", array(), false, 1 );
 
 	$scripts->add( 'json2', "/wp-includes/js/json2$suffix.js", array(), '2011-02-23');
 
 	$scripts->add( 'underscore', "/wp-includes/js/underscore$dev_suffix.js", array(), '1.6.0', 1 );
-	$scripts->add( 'backbone', "/wp-includes/js/backbone$dev_suffix.js", array( 'underscore','jquery' ), '1.1.0', 1 );
+	$scripts->add( 'backbone', "/wp-includes/js/backbone$dev_suffix.js", array( 'underscore','jquery' ), '1.1.2', 1 );
 
 	$scripts->add( 'wp-util', "/wp-includes/js/wp-util$suffix.js", array('underscore', 'jquery'), false, 1 );
 	did_action( 'init' ) && $scripts->localize( 'wp-util', '_wpUtilSettings', array(
@@ -314,6 +313,8 @@ function wp_default_scripts( &$scripts ) {
 	did_action( 'init' ) && $scripts->localize( 'wp-mediaelement', '_wpmejsSettings', array(
 		'pluginPath' => includes_url( 'js/mediaelement/', 'relative' ),
 	) );
+
+	$scripts->add( 'wp-playlist', "/wp-includes/js/mediaelement/wp-playlist.js", array( 'wp-util', 'backbone', 'mediaelement' ), false, 1 );
 
 	$scripts->add( 'zxcvbn-async', "/wp-includes/js/zxcvbn-async$suffix.js", array(), '1.0' );
 	did_action( 'init' ) && $scripts->localize( 'zxcvbn-async', '_zxcvbnSettings', array(
@@ -475,6 +476,8 @@ function wp_default_scripts( &$scripts ) {
 			'ays' => __('Are you sure you want to install this plugin?')
 		) );
 
+		$scripts->add( 'updates', "/wp-admin/js/updates$suffix.js", array( 'jquery' ) );
+
 		$scripts->add( 'farbtastic', '/wp-admin/js/farbtastic.js', array('jquery'), '1.2' );
 
 		$scripts->add( 'iris', '/wp-admin/js/iris.min.js', array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1 );
@@ -551,15 +554,6 @@ function wp_default_styles( &$styles ) {
 	$styles->text_direction = function_exists( 'is_rtl' ) && is_rtl() ? 'rtl' : 'ltr';
 	$styles->default_dirs = array('/wp-admin/', '/wp-includes/css/');
 
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	$rtl_styles = array( 'wp-admin', 'ie', 'media', 'admin-bar', 'customize-controls', 'media-views', 'wp-color-picker', 'wp-pointer', 'editor-buttons', 'farbtastic', 'wp-auth-check', 'wp-jquery-ui-dialog', 'media-views', 'buttons', 'install' );
-
-	$styles->add( 'wp-admin', "/wp-admin/css/wp-admin$suffix.css", array( 'open-sans', 'dashicons' ) );
-
-	$styles->add( 'ie', "/wp-admin/css/ie$suffix.css" );
-	$styles->add_data( 'ie', 'conditional', 'lte IE 7' );
-
 	$open_sans_font_url = '';
 
 	/* translators: If there are characters in your language that are not supported
@@ -585,36 +579,64 @@ function wp_default_styles( &$styles ) {
 		$open_sans_font_url = "//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,400,600&subset=$subsets";
 	}
 
+	// Register a stylesheet for the selected admin color scheme.
+	$colors_url = false;
+	if ( ! empty( $GLOBALS['_wp_admin_css_colors'] ) ) {
+		$color = get_user_option( 'admin_color' );
+		if ( ! $color || ! isset( $GLOBALS['_wp_admin_css_colors'][ $color ] ) ) {
+			$color = 'fresh';
+		}
+		$colors_url = $GLOBALS['_wp_admin_css_colors'][ $color ]->url;
+	}
+	$styles->add( 'colors', $colors_url, array( 'wp-admin', 'buttons', 'open-sans', 'dashicons' ) );
+
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+
+	// Admin CSS
+	$styles->add( 'wp-admin',           "/wp-admin/css/wp-admin$suffix.css", array( 'open-sans', 'dashicons' ) );
+	$styles->add( 'login',              "/wp-admin/css/login$suffix.css", array( 'buttons', 'open-sans', 'dashicons' ) );
+	$styles->add( 'install',            "/wp-admin/css/install$suffix.css", array( 'buttons', 'open-sans' ) );
+	$styles->add( 'wp-color-picker',    "/wp-admin/css/color-picker$suffix.css" );
+	$styles->add( 'customize-controls', "/wp-admin/css/customize-controls$suffix.css", array( 'wp-admin', 'colors', 'ie' ) );
+	$styles->add( 'ie',                 "/wp-admin/css/ie$suffix.css" );
+
+	$styles->add_data( 'ie', 'conditional', 'lte IE 7' );
+
+	// Common dependencies
+	$styles->add( 'buttons',   "/wp-includes/css/buttons$suffix.css" );
+	$styles->add( 'dashicons', "/wp-includes/css/dashicons$suffix.css" );
 	$styles->add( 'open-sans', $open_sans_font_url );
 
-	// Dashicons
-	$styles->add( 'dashicons', "/wp-includes/css/dashicons$suffix.css" );
-
-	// Register "meta" stylesheet for admin colors. All colors-* style sheets should have the same version string.
-
-	$styles->add( 'colors', true, array( 'wp-admin', 'buttons', 'open-sans', 'dashicons' ) );
-
-	// do not refer to this directly, the right one is queued by the above "meta" colors handle
-	$styles->add( 'colors-fresh', false, array( 'wp-admin', 'buttons' ) );
-
-	$styles->add( 'media', "/wp-admin/css/media$suffix.css" );
-	$styles->add( 'install', "/wp-admin/css/install$suffix.css", array( 'buttons', 'open-sans' ) );
-	$styles->add( 'thickbox', '/wp-includes/js/thickbox/thickbox.css', array( 'dashicons' ), '20131201' );
-	$styles->add( 'farbtastic', '/wp-admin/css/farbtastic.css', array(), '1.3u1' );
-	$styles->add( 'wp-color-picker', "/wp-admin/css/color-picker$suffix.css" );
-	$styles->add( 'jcrop', "/wp-includes/js/jcrop/jquery.Jcrop.min.css", array(), '0.9.12' );
-	$styles->add( 'imgareaselect', '/wp-includes/js/imgareaselect/imgareaselect.css', array(), '0.9.8' );
-	$styles->add( 'admin-bar', "/wp-includes/css/admin-bar$suffix.css", array( 'open-sans', 'dashicons' ) );
-	$styles->add( 'wp-jquery-ui-dialog', "/wp-includes/css/jquery-ui-dialog$suffix.css", array( 'dashicons' ) );
+	// Includes CSS
+	$styles->add( 'admin-bar',      "/wp-includes/css/admin-bar$suffix.css", array( 'open-sans', 'dashicons' ) );
+	$styles->add( 'wp-auth-check',  "/wp-includes/css/wp-auth-check$suffix.css", array( 'dashicons' ) );
 	$styles->add( 'editor-buttons', "/wp-includes/css/editor$suffix.css", array( 'dashicons' ) );
-	$styles->add( 'wp-pointer', "/wp-includes/css/wp-pointer$suffix.css", array( 'dashicons' ) );
-	$styles->add( 'customize-controls', "/wp-admin/css/customize-controls$suffix.css", array( 'wp-admin', 'colors', 'ie' ) );
-	$styles->add( 'media-views', "/wp-includes/css/media-views$suffix.css", array( 'buttons', 'dashicons' ) );
-	$styles->add( 'buttons', "/wp-includes/css/buttons$suffix.css" );
-	$styles->add( 'wp-auth-check', "/wp-includes/css/wp-auth-check$suffix.css", array( 'dashicons' ) );
+	$styles->add( 'media-views',    "/wp-includes/css/media-views$suffix.css", array( 'buttons', 'dashicons' ) );
+	$styles->add( 'wp-pointer',     "/wp-includes/css/wp-pointer$suffix.css", array( 'dashicons' ) );
 
-	$styles->add( 'mediaelement', "/wp-includes/js/mediaelement/mediaelementplayer.min.css", array(), '2.13.0' );
-	$styles->add( 'wp-mediaelement', "/wp-includes/js/mediaelement/wp-mediaelement.css", array( 'mediaelement' ) );
+	// External libraries and friends
+	$styles->add( 'imgareaselect',       '/wp-includes/js/imgareaselect/imgareaselect.css', array(), '0.9.8' );
+	$styles->add( 'wp-jquery-ui-dialog', "/wp-includes/css/jquery-ui-dialog$suffix.css", array( 'dashicons' ) );
+	$styles->add( 'mediaelement',        "/wp-includes/js/mediaelement/mediaelementplayer.min.css", array(), '2.13.0' );
+	$styles->add( 'wp-mediaelement',     "/wp-includes/js/mediaelement/wp-mediaelement.css", array( 'mediaelement' ) );
+	$styles->add( 'thickbox',            '/wp-includes/js/thickbox/thickbox.css', array( 'dashicons' ), '20131201' );
+
+	// Deprecated CSS
+	$styles->add( 'media',      "/wp-admin/css/deprecated-media$suffix.css" );
+	$styles->add( 'farbtastic', '/wp-admin/css/farbtastic.css', array(), '1.3u1' );
+	$styles->add( 'jcrop',      "/wp-includes/js/jcrop/jquery.Jcrop.min.css", array(), '0.9.12' );
+	$styles->add( 'colors-fresh', false, array( 'wp-admin', 'buttons' ) ); // Old handle.
+
+	// RTL CSS
+	$rtl_styles = array(
+		// wp-admin
+		'wp-admin', 'install', 'wp-color-picker', 'customize-controls', 'ie',
+		// wp-includes
+		'buttons', 'admin-bar', 'wp-auth-check', 'editor-buttons', 'media-views', 'wp-pointer',
+		'wp-jquery-ui-dialog',
+		// deprecated
+		'media', 'farbtastic',
+	);
 
 	foreach ( $rtl_styles as $rtl_style ) {
 		$styles->add_data( $rtl_style, 'rtl', 'replace' );
@@ -663,56 +685,6 @@ function wp_just_in_time_script_localization() {
 		'blog_id' => get_current_blog_id(),
 	) );
 
-}
-
-/**
- * Administration Screen CSS for changing the styles.
- *
- * If installing the 'wp-admin/' directory will be replaced with './'.
- *
- * The $_wp_admin_css_colors global manages the Administration Screens CSS
- * stylesheet that is loaded. The option that is set is 'admin_color' and is the
- * color and key for the array. The value for the color key is an object with
- * a 'url' parameter that has the URL path to the CSS file.
- *
- * The query from $src parameter will be appended to the URL that is given from
- * the $_wp_admin_css_colors array value URL.
- *
- * @since 2.6.0
- * @uses $_wp_admin_css_colors
- *
- * @param string $src Source URL.
- * @param string $handle Either 'colors' or 'colors-rtl'.
- * @return string URL path to CSS stylesheet for Administration Screens.
- */
-function wp_style_loader_src( $src, $handle ) {
-	if ( defined('WP_INSTALLING') )
-		return preg_replace( '#^wp-admin/#', './', $src );
-
-	if ( 'colors' == $handle || 'colors-rtl' == $handle ) {
-		global $_wp_admin_css_colors;
-		$color = get_user_option('admin_color');
-
-		if ( empty($color) || !isset($_wp_admin_css_colors[$color]) )
-			$color = 'fresh';
-
-		$color = $_wp_admin_css_colors[$color];
-		$parsed = parse_url( $src );
-		$url = $color->url;
-
-		if ( ! $url ) {
-			return false;
-		}
-
-		if ( isset($parsed['query']) && $parsed['query'] ) {
-			wp_parse_str( $parsed['query'], $qv );
-			$url = add_query_arg( $qv, $url );
-		}
-
-		return $url;
-	}
-
-	return $src;
 }
 
 /**
@@ -961,4 +933,3 @@ add_filter( 'wp_print_scripts', 'wp_just_in_time_script_localization' );
 add_filter( 'print_scripts_array', 'wp_prototype_before_jquery' );
 
 add_action( 'wp_default_styles', 'wp_default_styles' );
-add_filter( 'style_loader_src', 'wp_style_loader_src', 10, 2 );

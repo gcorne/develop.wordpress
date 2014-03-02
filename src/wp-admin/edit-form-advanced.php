@@ -24,7 +24,13 @@ $post_ID = isset($post_ID) ? (int) $post_ID : 0;
 $user_ID = isset($user_ID) ? (int) $user_ID : 0;
 $action = isset($action) ? $action : '';
 
-if ( post_type_supports($post_type, 'editor') || post_type_supports($post_type, 'thumbnail') ) {
+$media_type = false;
+if ( 'attachment' === $post_type && $post_ID ) {
+	$post = get_post( $post_ID );
+	$media_type = post_supports_thumbnails( $post );
+}
+
+if ( post_type_supports( $post_type, 'editor' ) || post_type_supports( $post_type, 'thumbnail' ) || $media_type ) {
 	add_thickbox();
 	wp_enqueue_media( array( 'post' => $post_ID ) );
 }
@@ -48,7 +54,7 @@ $messages['post'] = array(
 	 7 => __('Post saved.'),
 	 8 => sprintf( __('Post submitted. <a target="_blank" href="%s">Preview post</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
 	 9 => sprintf( __('Post scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview post</a>'),
-		// translators: Publish box date format, see http://php.net/date
+		/* translators: Publish box date format, see http://php.net/date */
 		date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ), esc_url( get_permalink($post_ID) ) ),
 	10 => sprintf( __('Post draft updated. <a target="_blank" href="%s">Preview post</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
 );
