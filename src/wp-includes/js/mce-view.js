@@ -166,6 +166,12 @@ window.wp = window.wp || {};
 			});
 		},
 
+		/**
+		 * Refresh view after an update is made
+		 * 
+		 * @param view {object} being refreshed
+		 * @param text {string} textual representation of the view
+		 */
 		refreshView: function( view, text ) {
 			var encodedText = window.encodeURIComponent( text ),
 				viewOptions,
@@ -184,7 +190,9 @@ window.wp = window.wp || {};
 			return instances[ encodedText ];
 		},
 
-		/** render( scope )
+		/** 
+		 * render( scope )
+		 * 
 		 * Renders any view instances inside a DOM node `scope`.
 		 *
 		 * View instances are detected by the presence of wrapper elements.
@@ -195,52 +203,6 @@ window.wp = window.wp || {};
 			_.each( instances, function( instance ) {
 				instance.render();
 			} );
-		},
-
-		/**
-		 * Select a view.
-		 *
-		 * Accepts a MCE view wrapper `node` (i.e. a node with the
-		 * `wpview-wrap` class).
-		 */
-		select: function( node ) {
-			var $node = $(node),
-				$clipboard,
-				text;
-
-			// Bail if node is already selected.
-			if ( $node.hasClass('selected') ) {
-				return;
-			}
-
-			$node.addClass('selected');
-
-			text = window.decodeURIComponent( $node.data('wpview-text') );
-
-			$clipboard = $( '<div />' )
-				.addClass( 'wpview-clipboard' )
-				.prop( 'contenteditable', 'true' )
-				.data( 'mce-bogus', '1' )
-				.text( text );
-
-			$node.prepend( $clipboard );
-
-		},
-
-		// ### Deselect a view.
-		//
-		// Accepts a MCE view wrapper `node` (i.e. a node with the
-		// `wpview-wrap` class).
-		deselect: function( node ) {
-			var $node = $(node);
-
-			// Bail if node is already selected.
-			if ( ! $node.hasClass('selected') ) {
-				return;
-			}
-
-			$node.removeClass('selected');
-			$node.find( '.wpview-clipboard' ).remove();
 		},
 
 		edit: function( node ) {

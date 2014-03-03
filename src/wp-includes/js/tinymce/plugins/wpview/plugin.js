@@ -72,9 +72,6 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		if ( viewNode === selected ) {
 			return;
 		}
-	//	if ( dom.hasClass( viewNode, 'selected' ) ) {
-	//		return;
-	//	}
 
 		deselect();
 		selected = viewNode;
@@ -111,34 +108,9 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 			editor.selection.select( selected.nextSibling );
 			editor.selection.collapse();
 
-
-		//	wp.mce.view.deselect( selected );
-
-		//	if ( ! $node.hasClass('selected') ) {
-		//		return;
-		//	}
-
-		//	$( node.firstChild ).trigger('deselect');
 		}
 
 		selected = null;
-	}
-
-	function refreshEmptyContentNode() {
-		var body = editor.getBody(),
-			node, editableNode;
-
-		// Gecko adds an editable node if there are no other editable elements
-		editableNode = editor.dom.select( '[_moz_editor_bogus_node]' );
-
-		if ( body.childNodes.length === ( 1 + editableNode.length ) ) {
-
-			node = body.childNodes[ body.childNodes.length - 1 ];
-
-			if ( node && isView( node ) ) {
-				body.appendChild( createPadNode() );
-			}
-		}
 	}
 
 	// Check if the `wp.mce` API exists.
@@ -321,33 +293,6 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 			dom.replace( dom.create( 'p', null, window.decodeURIComponent( dom.getAttrib( node, 'data-wpview-text' ) ) ), node );
 		});
     });
-/*
-	// Get attribute value from a tag string
-	function getAttr( tag, attr ) {
-		var value = new RegExp( attr + '="([^"]+)"' ).exec( tag );
-		return value ? window.decodeURIComponent( value[1] ) : '';
-	}
-
-	function toText( content ) {
-		return content.replace( /<div [^>]+>(?: |\u00a0|&nbsp;)*<\/div>/g, function( match ) {
-			var text = getAttr( match, 'data-wpview-text' );
-
-			if ( text ) {
-				return window.decodeURIComponent( text );
-			}
-
-			return match;
-		});
-	}
-
-	editor.on( 'PostProcess', function( e ) {
-		if ( ! e.get && ! e.save ) {
-			return;
-		}
-
-		e.content = toText( e.content );
-	});
-*/
 
 	editor.on( 'keydown', function( event ) {
 		var keyCode = event.keyCode,
