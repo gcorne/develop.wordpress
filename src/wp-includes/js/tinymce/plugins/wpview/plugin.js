@@ -27,8 +27,6 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 			( tinymce.Env.ie && tinymce.Env.ie < 11 ) ? '' : '<br data-mce-bogus="1" />' );
 	}
 
-	//
-	// @arg view can be either the view wrapper's HTML id or node
 	/**
 	 * Get the text/shortcode string for a view.
 	 *
@@ -92,7 +90,9 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 		editor.selection.select( clipboard, true );
 	}
 
-	// ### Deselect a view.
+	/**
+	 * Deselect a selected view and remove clipboard
+	 */
 	function deselect() {
 		var clipboard,
 			dom = editor.dom;
@@ -252,6 +252,7 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 						} else {
 							select( view );
 						}
+						return false;
 					}
 				}
 			} else {

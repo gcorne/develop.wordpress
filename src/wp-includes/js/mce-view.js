@@ -177,13 +177,17 @@ window.wp = window.wp || {};
 				viewOptions,
 				result, instance;
 
-			if ( ! wp.mce.views.getInstance( encodedText ) ) {
+			instance = wp.mce.views.getInstance( encodedText );
+
+			if ( ! instance ) {
 				result = view.toView( text );
 				viewOptions = result.options;
 				viewOptions.encodedText = encodedText;
 				instance = new view.View( viewOptions );
 				instances[ encodedText ] = instance;
 			}
+
+			wp.mce.views.render();
 		},
 
 		getInstance: function( encodedText ) {
