@@ -1,3 +1,5 @@
+/* global tinymce */
+
 // Ensure the global `wp` object exists.
 window.wp = window.wp || {};
 
@@ -5,16 +7,16 @@ window.wp = window.wp || {};
 	var views = {},
 		instances = {},
 		media = wp.media,
-		viewOptions = ['document', 'encodedText'];
+		viewOptions = ['encodedText'];
 
 	// Create the `wp.mce` object if necessary.
 	wp.mce = wp.mce || {};
 
 	/**
 	 * wp.mce.View
-	 * 
+	 *
 	 * A Backbone-like View constructor intended for use when rendering a TinyMCE View. The main difference is
-	 * that the TinyMCE View is intended to be short-lived. Once the view is rendered, the View is destroyed rather than 
+	 * that the TinyMCE View is intended to be short-lived. Once the view is rendered, the View is destroyed rather than
 	 * being attached to the DOM and listening for either DOM event or Backbone events.
 	 */
 	wp.mce.View = function( options ) {
@@ -31,9 +33,9 @@ window.wp = window.wp || {};
 	// take advantage of the Backbone extend method
 	wp.mce.View.extend = Backbone.View.extend;
 
-	/** 
+	/**
 	 * wp.mce.views
-	 * 
+	 *
 	 * A set of utilities that simplifies adding custom UI within a TinyMCE editor.
 	 * At its core, it serves as a series of converters, transforming text to a
 	 * custom UI, and back again.
@@ -46,7 +48,7 @@ window.wp = window.wp || {};
 		 * Registers a new TinyMCE view.
 		 *
 		 * @param type
-		 * @param constructor 
+		 * @param constructor
 		 *
 		 */
 		register: function( type, constructor ) {
@@ -78,7 +80,7 @@ window.wp = window.wp || {};
 		 * every match, which triggers the related data to be fetched.
 		 *
 		 */
-		toViews: function( document, content ) {
+		toViews: function( content ) {
 			var pieces = [ { content: content } ],
 				current;
 
@@ -106,7 +108,7 @@ window.wp = window.wp || {};
 
 						// Add the processed piece for the match.
 						pieces.push({
-							content: wp.mce.views.toView( document, viewType, result.content, result.options ),
+							content: wp.mce.views.toView( viewType, result.content, result.options ),
 							processed: true
 						});
 
@@ -129,10 +131,11 @@ window.wp = window.wp || {};
 		 * Create a placeholder for a particular view type
 		 *
 		 * @param viewType
-		 * @param content
+		 * @param text
+		 * @param options
 		 *
 		 */
-		toView: function( document, viewType, text, options ) {
+		toView: function( viewType, text, options ) {
 			var view = wp.mce.views.get( viewType ),
 				encodedText = window.encodeURIComponent( text ),
 				instance, viewOptions;
@@ -142,9 +145,8 @@ window.wp = window.wp || {};
 				return text;
 			}
 
-			if ( ! wp.mce.views.getInstance() ) {
+			if ( ! wp.mce.views.getInstance( encodedText ) ) {
 				viewOptions = options;
-				viewOptions.document = document;
 				viewOptions.encodedText = encodedText;
 				instance = new view.View( viewOptions );
 				instances[ encodedText ] = instance;
@@ -156,11 +158,26 @@ window.wp = window.wp || {};
 				attrs: {
 					'class': 'wpview-wrap wpview-type-' + viewType,
 					'data-wpview-text': encodedText,
+					'data-wpview-type': viewType,
 					'contenteditable': 'false'
 				},
 
 				content: '\u00a0'
 			});
+		},
+
+		refreshView: function( view, text ) {
+			var encodedText = window.encodeURIComponent( text ),
+				viewOptions,
+				result, instance;
+
+			if ( ! wp.mce.views.getInstance( encodedText ) ) {
+				result = view.toView( text );
+				viewOptions = result.options;
+				viewOptions.encodedText = encodedText;
+				instance = new view.View( viewOptions );
+				instances[ encodedText ] = instance;
+			}
 		},
 
 		getInstance: function( encodedText ) {
@@ -224,6 +241,15 @@ window.wp = window.wp || {};
 
 			$node.removeClass('selected');
 			$node.find( '.wpview-clipboard' ).remove();
+		},
+
+		edit: function( node ) {
+			var viewType = $( node ).data('wpview-type'),
+				view = wp.mce.views.get( viewType );
+
+			if ( view ) {
+				view.edit( node );
+			}
 		}
 	};
 
@@ -280,9 +306,33 @@ window.wp = window.wp || {};
 
 				html = this.template( options );
 
-				$( this.document ).find( '[data-wpview-text="' + this.encodedText + '"]' ).html( html );
+				// Search all tinymce editor instances and update the placeholders
+				_.each( tinymce.editors, function( editor ) {
+					var doc;
+					if ( editor.plugins.wpview ) {
+						doc = editor.getDoc();
+						$( doc ).find( '[data-wpview-text="' + this.encodedText + '"]' ).html( html );
+					}
+				}, this );
 			}
-		})
+		}),
+
+		edit: function( node ) {
+			var gallery = wp.media.gallery,
+				self = this,
+				frame, data;
+
+			data = window.decodeURIComponent( $( node ).data('wpview-text') );
+			frame = gallery.edit( data );
+
+			frame.state('gallery-edit').on( 'update', function( selection ) {
+				var shortcode = gallery.shortcode( selection ).string();
+				$( node ).attr( 'data-wpview-text', window.encodeURIComponent( shortcode ) );
+				wp.mce.views.refreshView( self, shortcode );
+				frame.detach();
+			});
+		}
+
 	};
 	wp.mce.views.register( 'gallery', wp.mce.gallery );
 }(jQuery));
