@@ -154,14 +154,13 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 
 	// When the editor's content changes, scan the new content for
 	// matching view patterns, and transform the matches into
-	// view wrappers. Since the editor's DOM is outdated at this point,
-	// we'll wait to render the views.
+	// view wrappers.
 	editor.on( 'BeforeSetContent', function( e ) {
 		if ( ! e.content ) {
 			return;
 		}
 
-		e.content = wp.mce.view.toViews( e.content );
+		e.content = wp.mce.views.toViews( editor.getDoc(), e.content );
 	});
 
 	// When the editor's content has been updated and the DOM has been
@@ -169,7 +168,7 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 	editor.on( 'SetContent', function( event ) {
 		var body, padNode;
 
-		wp.mce.view.render( editor.getDoc() );
+		wp.mce.views.render();
 
 		// Add padding <p> if the noneditable node is last
 		if ( event.load || ! event.set ) {
@@ -262,8 +261,8 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 				return;
 			}
 
-			node.innerHTML = wp.mce.view.toViews( node.innerHTML );
-			wp.mce.view.render( node );
+			node.innerHTML = wp.mce.views.toViews( editor.getDoc(), node.innerHTML );
+			//wp.mce.view.render( node );
 		});
 		
 		editor.dom.bind( editor.getBody(), 'mousedown mouseup click', function( event ) {
@@ -373,7 +372,7 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 
 		// If delete or backspace is pressed, delete the view.
 		if ( keyCode === VK.DELETE || keyCode === VK.BACKSPACE ) {
-			if ( instance = wp.mce.view.instance( selected ) ) {
+			if ( instance = wp.mce.views.instance( selected ) ) {
 				instance.remove();
 				deselect();
 			}
@@ -388,7 +387,7 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 			body = editor.getBody();
 
 		if ( toRemove ) {
-			instance = wp.mce.view.instance( toRemove );
+			instance = wp.mce.views.instance( toRemove );
 			instance.remove();
 			toRemove = false;
 		}
