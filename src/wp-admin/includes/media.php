@@ -1687,7 +1687,7 @@ function media_upload_form( $errors = null ) {
 	global $type, $tab, $is_IE, $is_opera;
 
 	if ( ! _device_can_upload() ) {
-		echo '<p>' . sprintf( __('The web browser on your device cannot be used to upload files. You may be able to use the <a href="%s">native app for your device</a> instead.'), 'http://wordpress.org/mobile/' ) . '</p>';
+		echo '<p>' . sprintf( __('The web browser on your device cannot be used to upload files. You may be able to use the <a href="%s">native app for your device</a> instead.'), 'https://wordpress.org/mobile/' ) . '</p>';
 		return;
 	}
 
@@ -2255,15 +2255,18 @@ function media_upload_library_form($errors) {
 	if ( get_user_setting('uploader') )
 		$form_class .= ' html-uploader';
 
-	$_GET['paged'] = isset( $_GET['paged'] ) ? intval($_GET['paged']) : 0;
-	if ( $_GET['paged'] < 1 )
-		$_GET['paged'] = 1;
-	$start = ( $_GET['paged'] - 1 ) * 10;
-	if ( $start < 1 )
-		$start = 0;
-	add_filter( 'post_limits', create_function( '$a', "return 'LIMIT $start, 10';" ) );
+	$q = $_GET;
+	$q['posts_per_page'] = 10;
+	$q = isset( $q['paged'] ) ? intval( $q['paged'] ) : 0;
+	if ( $q['paged'] < 1 ) {
+		$q['paged'] = 1;
+	}
+	$q['offset'] = ( $q['paged'] - 1 ) * 10;
+	if ( $q['offset'] < 1 ) {
+		$q['offset'] = 0;
+	}
 
-	list($post_mime_types, $avail_post_mime_types) = wp_edit_attachments_query();
+	list($post_mime_types, $avail_post_mime_types) = wp_edit_attachments_query( $q );
 
 ?>
 
