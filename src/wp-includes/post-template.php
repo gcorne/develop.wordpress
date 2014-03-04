@@ -714,6 +714,19 @@ function _wp_link_page( $i ) {
 			$url = trailingslashit(get_permalink()) . user_trailingslashit($i, 'single_paged');
 	}
 
+	if ( is_preview() ) {
+		$url = add_query_arg( array(
+			'preview' => 'true'
+		), $url );
+
+		if ( ( 'draft' !== $post->post_status ) && isset( $_GET['preview_id'], $_GET['preview_nonce'] ) ) {
+			$url = add_query_arg( array(
+				'preview_id'    => wp_unslash( $_GET['preview_id'] ),
+				'preview_nonce' => wp_unslash( $_GET['preview_nonce'] )
+			), $url );
+		}
+	}
+
 	return '<a href="' . esc_url( $url ) . '">';
 }
 
@@ -1134,7 +1147,13 @@ class Walker_PageDropdown extends Walker {
 		if ( $page->ID == $args['selected'] )
 			$output .= ' selected="selected"';
 		$output .= '>';
-		$title = apply_filters( 'list_pages', $page->post_title, $page );
+
+		$title = $page->post_title;
+		if ( '' === $title ) {
+			$title = sprintf( __( '#%d (no title)' ), $page->ID );
+		}
+
+		$title = apply_filters( 'list_pages', $title, $page );
 		$output .= $pad . esc_html( $title );
 		$output .= "</option>\n";
 	}

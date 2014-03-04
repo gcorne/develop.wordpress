@@ -27,7 +27,7 @@ function got_mod_rewrite() {
 	 * @since 2.5.0
 	 * @param bool $got_rewrite Whether Apache and mod_rewrite are present.
 	 */
-	return apply_filters('got_rewrite', $got_rewrite);
+	return apply_filters( 'got_rewrite', $got_rewrite );
 }
 
 /**
@@ -334,7 +334,16 @@ function wp_doc_link_parse( $content ) {
 
 	$functions = array_unique( $functions );
 	sort( $functions );
+
+	/**
+	 * Filter the list of functions/classes to be ignored from the documentation lookup.
+	 *
+	 * @since 2.8.0
+	 *
+	 * @param array $ignore_functions Functions/Classes to be ignored.
+	 */
 	$ignore_functions = apply_filters( 'documentation_ignore_functions', $ignore_functions );
+
 	$ignore_functions = array_unique( $ignore_functions );
 
 	$out = array();
@@ -351,7 +360,7 @@ function wp_doc_link_parse( $content ) {
  * Saves option for number of rows when listing posts, pages, comments, etc.
  *
  * @since 2.8.0
-**/
+ */
 function set_screen_options() {
 
 	if ( isset($_POST['wp_screen_options']) && is_array($_POST['wp_screen_options']) ) {
@@ -394,7 +403,25 @@ function set_screen_options() {
 					return;
 				break;
 			default:
-				$value = apply_filters('set-screen-option', false, $option, $value);
+
+				/**
+				 * Filter a screen option value before it is set.
+				 *
+				 * The filter can also be used to modify non-standard [items]_per_page
+				 * settings. See the parent function for a full list of standard options.
+				 *
+				 * Returning false to the filter will skip saving the current option.
+				 *
+				 * @since 2.8.0
+				 *
+				 * @see set_screen_options()
+				 *
+				 * @param bool|int $value  Screen option value. Default false to skip.
+				 * @param string   $option The option name.
+				 * @param int      $value  The number of rows to use.
+				 */
+				$value = apply_filters( 'set-screen-option', false, $option, $value );
+
 				if ( false === $value )
 					return;
 				break;
