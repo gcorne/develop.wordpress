@@ -41,6 +41,12 @@ function wp_print_media_templates() {
 		</div>
 	</script>
 
+	<script type="text/html" id="tmpl-uploader-editor">
+		<div class="uploader-editor-content">
+			<h3><?php _e( 'Drop files to upload' ); ?></h3>
+		</div>
+	</script>
+
 	<script type="text/html" id="tmpl-uploader-inline">
 		<# var messageClass = data.message ? 'has-upload-message' : 'no-upload-message'; #>
 		<div class="uploader-inline-content {{ messageClass }}">
@@ -48,7 +54,7 @@ function wp_print_media_templates() {
 			<h3 class="upload-message">{{ data.message }}</h3>
 		<# } #>
 		<?php if ( ! _device_can_upload() ) : ?>
-			<h3 class="upload-instructions"><?php printf( __('The web browser on your device cannot be used to upload files. You may be able to use the <a href="%s">native app for your device</a> instead.'), 'http://wordpress.org/mobile/' ); ?></h3>
+			<h3 class="upload-instructions"><?php printf( __('The web browser on your device cannot be used to upload files. You may be able to use the <a href="%s">native app for your device</a> instead.'), 'https://wordpress.org/mobile/' ); ?></h3>
 		<?php elseif ( is_multisite() && ! is_upload_space_available() ) : ?>
 			<h3 class="upload-instructions"><?php _e( 'Upload Limit Exceeded' ); ?></h3>
 			<?php
@@ -98,13 +104,6 @@ function wp_print_media_templates() {
 				<p class="max-upload-size"><?php
 					printf( __( 'Maximum upload file size: %d%s.' ), esc_html($upload_size_unit), esc_html($byte_sizes[$u]) );
 				?></p>
-
-				<?php if ( ( $GLOBALS['is_IE'] || $GLOBALS['is_opera']) && $max_upload_size > 100 * 1024 * 1024 ) :
-					$browser_uploader = admin_url( 'media-new.php?browser-uploader&post_id=' ) . '{{ data.postId }}';
-					?>
-					<p class="big-file-warning"><?php printf( __( 'Your browser has some limitations uploading large files with the multi-file uploader. Please use the <a href="%1$s" target="%2$s">browser uploader</a> for files over 100MB.' ),
-						$browser_uploader, '_blank' ); ?></p>
-				<?php endif; ?>
 
 				<?php
 				/** This action is documented in wp-admin/includes/media.php */
@@ -432,32 +431,32 @@ function wp_print_media_templates() {
 		</label>
 
 		<#
-			var playlist = 'playlist-edit' === data.controller.id, emptyModel = 'undefined' === typeof data.model.style;
+			var playlist = 'playlist-edit' === data.controller.id, emptyModel = _.isEmpty(data.model);
 		#>
 		<label class="setting">
 			<span><?php _e( 'Show Tracklist' ); ?></span>
-			<input type="checkbox" data-setting="_tracklist" <# if ( playlist && emptyModel ) { #>
+			<input type="checkbox" data-setting="tracklist" <# if ( playlist && emptyModel ) { #>
 				checked="checked"
 			<# } #> />
 		</label>
 
 		<label class="setting">
 			<span><?php _e( 'Show Track Numbers' ); ?></span>
-			<input type="checkbox" data-setting="_tracknumbers" <# if ( playlist && emptyModel ) { #>
+			<input type="checkbox" data-setting="tracknumbers" <# if ( playlist && emptyModel ) { #>
 				checked="checked"
 			<# } #> />
 		</label>
 
 		<label class="setting">
 			<span><?php _e( 'Show Artist Name in Tracklist' ); ?></span>
-			<input type="checkbox" data-setting="_artists" <# if ( playlist && emptyModel ) { #>
+			<input type="checkbox" data-setting="artists" <# if ( playlist && emptyModel ) { #>
 				checked="checked"
 			<# } #> />
 		</label>
 
 		<label class="setting">
 			<span><?php _e( 'Show Images' ); ?></span>
-			<input type="checkbox" data-setting="_images" <# if ( emptyModel ) { #>
+			<input type="checkbox" data-setting="images" <# if ( emptyModel ) { #>
 				checked="checked"
 			<# } #> />
 		</label>
