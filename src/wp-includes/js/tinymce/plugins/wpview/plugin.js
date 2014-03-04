@@ -249,12 +249,13 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 							wp.mce.views.edit( view );
 						} else if ( editor.dom.hasClass( event.target, 'remove' ) ) {
 							editor.dom.remove( view );
-						} else {
-							select( view );
 						}
-						return false;
 					}
 				}
+				select( view );
+				// returning false stops the ugly bars from appearing in IE11 and stops the view being selected a a range in FF
+				// unfortunately, it also inhibits the dragging fo views to a new location
+				return false;
 			} else {
 				if ( event.type === 'click' ) {
 					deselect();
