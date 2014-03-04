@@ -334,20 +334,32 @@ tinymce.PluginManager.add( 'wpview', function( editor ) {
 	editor.on( 'keyup', function( event ) {
 		var padNode,
 			keyCode = event.keyCode,
-			body = editor.getBody();
+			body = editor.getBody(),
+			range;
 
 		if ( toRemove ) {
 			editor.dom.remove( toRemove );
 			toRemove = false;
 		}
 
-		// Make sure there is padding if the last element is a view
-		if ( ( keyCode === VK.DELETE || keyCode === VK.BACKSPACE ) && isView( body.lastChild ) ) {
-			padNode = createPadNode();
-			body.appendChild( padNode );
+		if ( keyCode === VK.DELETE || keyCode === VK.BACKSPACE ) {
+			// Make sure there is padding if the last element is a view
+			if ( isView( body.lastChild ) ) {
+				padNode = createPadNode();
+				body.appendChild( padNode );
 
-			if ( body.childNodes.length === 2 ) {
-				editor.selection.setCursorLocation( padNode, 0 );
+				if ( body.childNodes.length === 2 ) {
+					editor.selection.setCursorLocation( padNode, 0 );
+				}
+			}
+
+			range = editor.selection.getRng();
+
+			// Allow an initial element in the document to be removed when it is before a view
+			if ( body.firstChild === range.startContainer && range.collapsed === true &&
+					isView( range.startContainer.nextSibling ) && range.startOffset === 0 ) {
+
+				editor.dom.remove( range.startContainer );
 			}
 		}
 	});
