@@ -16,8 +16,7 @@ window.wp = window.wp || {};
 	 * wp.mce.View
 	 *
 	 * A Backbone-like View constructor intended for use when rendering a TinyMCE View. The main difference is
-	 * that the TinyMCE View is intended to be short-lived. Once the view is rendered, the View is destroyed rather than
-	 * being attached to the DOM and listening for either DOM event or Backbone events.
+	 * that the TinyMCE View is not tied to a particular DOM node.
 	 */
 	wp.mce.View = function( options ) {
 		options || (options = {});
@@ -27,7 +26,18 @@ window.wp = window.wp || {};
 
 	_.extend( wp.mce.View.prototype, {
 		initialize: function() {},
-		render: function() {}
+		html: function() {},
+		render: function() {
+			var html = this.getHtml();
+			// Search all tinymce editor instances and update the placeholders
+			_.each( tinymce.editors, function( editor ) {
+				var doc;
+				if ( editor.plugins.wpview ) {
+					doc = editor.getDoc();
+					$( doc ).find( '[data-wpview-text="' + this.encodedText + '"]' ).html( html );
+				}
+			}, this );
+		}
 	} );
 
 	// take advantage of the Backbone extend method
@@ -167,7 +177,7 @@ window.wp = window.wp || {};
 		},
 
 		/**
-		 * Refresh view after an update is made
+		 * Refresh views after an update is made
 		 * 
 		 * @param view {object} being refreshed
 		 * @param text {string} textual representation of the view
@@ -256,10 +266,9 @@ window.wp = window.wp || {};
 				this.attachments.more().done( _.bind( this.render, this ) );
 			},
 
-			render: function() {
+			getHtml: function() {
 				var attrs = this.shortcode.attrs.named,
-					options,
-					html;
+					options;
 
 				if ( ! this.attachments.length ) {
 					return;
@@ -270,16 +279,8 @@ window.wp = window.wp || {};
 					columns: attrs.columns ? parseInt( attrs.columns, 10 ) : 3
 				};
 
-				html = this.template( options );
+				return this.template( options );
 
-				// Search all tinymce editor instances and update the placeholders
-				_.each( tinymce.editors, function( editor ) {
-					var doc;
-					if ( editor.plugins.wpview ) {
-						doc = editor.getDoc();
-						$( doc ).find( '[data-wpview-text="' + this.encodedText + '"]' ).html( html );
-					}
-				}, this );
 			}
 		}),
 
