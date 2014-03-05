@@ -242,6 +242,7 @@ final class _WP_Editors {
 						'wpgallery',
 						'wplink',
 						'wpdialogs',
+						'wpview',
 					) ) );
 
 					if ( ( $key = array_search( 'spellchecker', $plugins ) ) !== false ) {
@@ -501,6 +502,9 @@ final class _WP_Editors {
 		if ( self::$has_medialib ) {
 			add_thickbox();
 			wp_enqueue_script('media-upload');
+
+			if ( self::$has_tinymce )
+				wp_enqueue_script('mce-view');
 		}
 	}
 
@@ -897,7 +901,6 @@ final class _WP_Editors {
 			'numlist' => array( 'title' => __('Ordered list (Alt + Shift + O)'), 'both' => false ),
 			'blockquote' => array( 'title' => __('Blockquote (Alt + Shift + Q)'), 'both' => false ),
 			'wp-media-library' => array( 'title' => __('Media library (Alt + Shift + M)'), 'both' => true ),
-			'image' => array( 'title' => __('Insert/edit image'), 'both' => false ),
 			'link' => array( 'title' => __('Insert/edit link (Alt + Shift + A)'), 'both' => true ),
 			'unlink' => array( 'title' => __('Unlink (Alt + Shift + S)'), 'both' => false ),
 			'help' => array( 'title' => __('Help (Alt + Shift + H)'), 'both' => false ),

@@ -673,6 +673,7 @@ add_shortcode('caption', 'img_caption_shortcode');
  *                           'aligncenter', alignright', 'alignnone'.
  *     @type int    $width   The width of the caption, in pixels.
  *     @type string $caption The caption text.
+ *     @type string $class   Additional class name(s) added to the caption container.
  * }
  * @param string $content Optional. Shortcode content.
  * @return string HTML content to display the caption.
@@ -708,7 +709,8 @@ function img_caption_shortcode( $attr, $content = null ) {
 		'id'	  => '',
 		'align'	  => 'alignnone',
 		'width'	  => '',
-		'caption' => ''
+		'caption' => '',
+		'class'   => '',
 	), $attr, 'caption' );
 
 	$atts['width'] = (int) $atts['width'];
@@ -741,7 +743,9 @@ function img_caption_shortcode( $attr, $content = null ) {
 	if ( $caption_width )
 		$style = 'style="width: ' . (int) $caption_width . 'px" ';
 
-	return '<div ' . $atts['id'] . $style . 'class="wp-caption ' . esc_attr( $atts['align'] ) . '">'
+	$class = trim( 'wp-caption ' . $atts['align'] . ' ' . $atts['class'] );
+
+	return '<div ' . $atts['id'] . $style . 'class="' . esc_attr( $class ) . '">'
 	. do_shortcode( $content ) . '<p class="wp-caption-text">' . $atts['caption'] . '</p></div>';
 }
 
@@ -875,7 +879,17 @@ function gallery_shortcode( $attr ) {
 	$selector = "gallery-{$instance}";
 
 	$gallery_style = $gallery_div = '';
-	if ( apply_filters( 'use_default_gallery_style', true ) )
+
+	/**
+	 * Filter whether to print default gallery styles.
+	 *
+	 * @since 3.1.0
+	 *
+	 * @param bool $print Whether to print default gallery styles.
+	 *                    Defaults to false if the theme supports HTML5 galleries.
+	 *                    Otherwise, defaults to true.
+	 */
+	if ( apply_filters( 'use_default_gallery_style', ! $html5 ) ) {
 		$gallery_style = "
 		<style type='text/css'>
 			#{$selector} {
@@ -894,10 +908,12 @@ function gallery_shortcode( $attr ) {
 				margin-left: 0;
 			}
 			/* see gallery_shortcode() in wp-includes/media.php */
-		</style>";
+		</style>\n\t\t";
+	}
+
 	$size_class = sanitize_html_class( $size );
 	$gallery_div = "<div id='$selector' class='gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class}'>";
-	$output = apply_filters( 'gallery_style', $gallery_style . "\n\t\t" . $gallery_div );
+	$output = apply_filters( 'gallery_style', $gallery_style . $gallery_div );
 
 	$i = 0;
 	foreach ( $attachments as $id => $attachment ) {
@@ -2365,6 +2381,16 @@ function wp_enqueue_media( $args = array() ) {
 		'imageReplaceTitle'     => __( 'Replace Image' ),
 		'imageDetailsCancel'    => __( 'Cancel Edit' ),
 
+		// Edit Image
+		'audioDetailsTitle'     => __( 'Audio Details' ),
+		'audioReplaceTitle'     => __( 'Replace Audio' ),
+		'audioDetailsCancel'    => __( 'Cancel Edit' ),
+
+		// Edit Image
+		'videoDetailsTitle'     => __( 'Video Details' ),
+		'videoReplaceTitle'     => __( 'Replace Video' ),
+		'videoDetailsCancel'    => __( 'Cancel Edit' ),
+
  		// Playlist
  		'playlistDragInfo'    => __( 'Drag and drop to reorder tracks.' ),
  		'createPlaylistTitle' => __( 'Create Playlist' ),
@@ -2550,13 +2576,13 @@ function get_post_gallery_images( $post = 0 ) {
 }
 
 /**
- * If an attachment is missing its metadata, try to regenerate it
+ * If an attachment is missing its metadata, try to generate it.
  *
  * @since 3.9.0
  *
  * @param post $attachment Post object.
  */
-function maybe_regenerate_attachment_metadata( $attachment ) {
+function wp_maybe_generate_attachment_metadata( $attachment ) {
 	if ( empty( $attachment ) || ( empty( $attachment->ID ) || ! $attachment_id = (int) $attachment->ID ) ) {
 		return;
 	}
@@ -2565,7 +2591,7 @@ function maybe_regenerate_attachment_metadata( $attachment ) {
 	$meta = wp_get_attachment_metadata( $attachment_id );
 	if ( empty( $meta ) && file_exists( $file ) ) {
 		$_meta = get_post_meta( $attachment_id );
-		$regeneration_lock = 'wp_regenerating_' . $attachment_id;
+		$regeneration_lock = 'wp_generating_att_' . $attachment_id;
 		if ( ! array_key_exists( '_wp_attachment_metadata', $_meta ) && ! get_transient( $regeneration_lock ) ) {
 			set_transient( $regeneration_lock, $file );
 			wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $file ) );
