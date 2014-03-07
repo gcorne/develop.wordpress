@@ -217,7 +217,11 @@ function wp_print_media_templates() {
 				<# } #>
 
 				<# if ( ! data.uploading && data.can.remove ) { #>
-					<a class="delete-attachment" href="#"><?php _e( 'Delete Permanently' ); ?></a>
+					<?php if ( MEDIA_TRASH ): ?>
+						<a class="trash-attachment" href="#"><?php _e( 'Trash' ); ?></a>
+					<?php else: ?>
+						<a class="delete-attachment" href="#"><?php _e( 'Delete Permanently' ); ?></a>
+					<?php endif; ?>
 				<# } #>
 
 				<div class="compat-meta">
@@ -559,6 +563,9 @@ function wp_print_media_templates() {
 				<div class="thumbnail">
 					<img src="{{ data.model.url }}" draggable="false" />
 				</div>
+				<# if ( data.attachment ) { #>
+					<input type="button" class="edit-attachment button" value="<?php esc_attr_e( 'Edit Image' ); ?>" />
+				<# } #>
 
 				<div class="setting url">
 					<?php // might want to make the url editable if it isn't an attachment ?>
@@ -649,16 +656,27 @@ function wp_print_media_templates() {
 		</div>
 	</script>
 
+	<script type="text/html" id="tmpl-image-editor">
+		<div id="media-head-{{{ data.id }}}"></div>
+		<div id="image-editor-{{{ data.id }}}"></div>
+	</script>
+
 	<script type="text/html" id="tmpl-audio-details">
-		<?php // reusing .media-embed to pick up the styles for now ?>
-		<# var rendered = false; #>
+		<?php // reusing .media-embed to pick up the styles for now
+		?><# var rendered = false; #>
 		<div class="media-embed">
 			<div class="embed-media-settings embed-audio-settings">
 				<# if ( data.model.src ) { #>
-					<audio class="wp-audio-shortcode" src="{{{ data.model.src }}}"
+					<audio controls
+						class="wp-audio-shortcode"
+						src="{{{ data.model.src }}}"
 						preload="{{{ _.isUndefined( data.model.preload ) ? 'none' : data.model.preload }}}"
-						<# if ( ! _.isUndefined( data.model.autoplay ) && data.model.autoplay ) { #>autoplay<# } #>
-						<# if ( ! _.isUndefined( data.model.loop ) && data.model.loop ) { #>loop<# } #>
+						<#
+						<?php foreach ( array( 'autoplay', 'loop' ) as $attr ):
+						?>if ( ! _.isUndefined( data.model.<?php echo $attr ?> ) && data.model.<?php echo $attr ?> ) {
+							#> <?php echo $attr ?><#
+						}
+						<?php endforeach ?>#>
 					/>
 					<# rendered = true; #>
 				<label class="setting">
@@ -669,16 +687,21 @@ function wp_print_media_templates() {
 				<?php
 				$default_types = wp_get_audio_extensions();
 
-				foreach ( $default_types as $type ): ?>
-				<# if ( data.model.<?php echo $type ?> ) { #>
+				foreach ( $default_types as $type ):
+				?><# if ( data.model.<?php echo $type ?> ) { #>
 					<# if ( ! rendered ) { #>
-					<audio class="wp-audio-shortcode" src="{{{ data.model.<?php echo $type ?> }}}"
+					<audio controls
+						class="wp-audio-shortcode"
+						src="{{{ data.model.<?php echo $type ?> }}}"
 						preload="{{{ _.isUndefined( data.model.preload ) ? 'none' : data.model.preload }}}"
-						<# if ( ! _.isUndefined( data.model.autoplay ) && data.model.autoplay ) { #>autoplay<# } #>
-						<# if ( ! _.isUndefined( data.model.loop ) && data.model.loop ) { #>loop<# } #>
+						<#
+						<?php foreach ( array( 'autoplay', 'loop' ) as $attr ):
+						?>if ( ! _.isUndefined( data.model.<?php echo $attr ?> ) && data.model.<?php echo $attr ?> ) {
+							#> <?php echo $attr ?><#
+						}
+						<?php endforeach ?>#>
 					/>
-					<#
-						rendered = true;
+					<# rendered = true;
 					} #>
 				<label class="setting">
 					<span><?php echo strtoupper( $type ) ?></span>
@@ -690,15 +713,9 @@ function wp_print_media_templates() {
 				<div class="setting preload">
 					<span><?php _e( 'Preload' ); ?></span>
 					<div class="button-group button-large" data-setting="preload">
-						<button class="button" value="auto">
-							<?php esc_attr_e( 'Auto' ); ?>
-						</button>
-						<button class="button" value="metadata">
-							<?php esc_attr_e( 'Metadata' ); ?>
-						</button>
-						<button class="button active" value="none">
-							<?php esc_attr_e( 'None' ); ?>
-						</button>
+						<button class="button" value="auto"><?php _e( 'Auto' ); ?></button>
+						<button class="button" value="metadata"><?php _e( 'Metadata' ); ?></button>
+						<button class="button active" value="none"><?php _e( 'None' ); ?></button>
 					</div>
 				</div>
 
@@ -717,52 +734,105 @@ function wp_print_media_templates() {
 	</script>
 
 	<script type="text/html" id="tmpl-video-details">
-		<?php // reusing .media-embed to pick up the styles for now ?>
-		<# var rendered = false; #>
+		<?php // reusing .media-embed to pick up the styles for now
+		?><# var rendered = false; #>
 		<div class="media-embed">
 			<div class="embed-media-settings embed-video-settings">
 				<div class="wp-video-holder">
 				<#
 				var w = ! data.model.width || data.model.width > 640 ? 640 : data.model.width,
-					h = ! data.model.height ? 320 : data.model.height;
+					h = ! data.model.height ? 360 : data.model.height;
 
-				if ( w !== data.model.width ) {
+				if ( data.model.width && w !== data.model.width ) {
 					h = Math.ceil( ( h * w ) / data.model.width );
 				}
 
-				if ( data.model.src ) { #>
-					<video class="wp-video-shortcode"
+				if ( data.model.src ) {
+					if ( data.model.src.match(/youtube|youtu\.be/) ) {
+				#>
+					<video controls
+						class="wp-video-shortcode youtube-video"
+						width="{{{ w }}}"
+						height="{{{ h }}}"
+						<?php
+						$props = array( 'poster' => '', 'preload' => 'metadata' );
+						foreach ( $props as $key => $value ):
+							if ( empty( $value ) ) {
+							?><#
+							if ( ! _.isUndefined( data.model.<?php echo $key ?> ) && data.model.<?php echo $key ?> ) {
+								#> <?php echo $key ?>="{{{ data.model.<?php echo $key ?> }}}"<#
+							} #>
+							<?php } else {
+								echo $key ?>="{{{ _.isUndefined( data.model.<?php echo $key ?> ) ? '<?php echo $value ?>' : data.model.<?php echo $key ?> }}}"<?php
+							}
+						endforeach;
+						?><#
+						<?php foreach ( array( 'autoplay', 'loop' ) as $attr ):
+						?> if ( ! _.isUndefined( data.model.<?php echo $attr ?> ) && data.model.<?php echo $attr ?> ) {
+							#> <?php echo $attr ?><#
+						}
+						<?php endforeach ?>#>
+					>
+						<source type="video/youtube" src="{{{ data.model.src }}}" />
+					</video>
+				<#
+					} else {
+				#>
+					<video controls
+						class="wp-video-shortcode"
 						width="{{{ w }}}"
 						height="{{{ h }}}"
 						src="{{{ data.model.src }}}"
-						<# if ( ! _.isUndefined( data.model.poster ) ) { #>poster="{{{ data.model.poster }}}"<# } #>
-						preload="{{{ _.isUndefined( data.model.preload ) ? 'metadata' : data.model.preload }}}"
-						<# if ( ! _.isUndefined( data.model.autoplay ) && data.model.autoplay ) { #>autoplay<# } #>
-						<# if ( ! _.isUndefined( data.model.loop ) && data.model.loop ) { #>loop<# } #>
+						<?php
+						$props = array( 'poster' => '', 'preload' => 'metadata' );
+						foreach ( $props as $key => $value ):
+							if ( empty( $value ) ) {
+							?><#
+							if ( ! _.isUndefined( data.model.<?php echo $key ?> ) && data.model.<?php echo $key ?> ) {
+								#> <?php echo $key ?>="{{{ data.model.<?php echo $key ?> }}}"<#
+							} #>
+							<?php } else {
+								echo $key ?>="{{{ _.isUndefined( data.model.<?php echo $key ?> ) ? '<?php echo $value ?>' : data.model.<?php echo $key ?> }}}"<?php
+							}
+						endforeach;
+						?><#
+						<?php foreach ( array( 'autoplay', 'loop' ) as $attr ):
+						?> if ( ! _.isUndefined( data.model.<?php echo $attr ?> ) && data.model.<?php echo $attr ?> ) {
+							#> <?php echo $attr ?><#
+						}
+						<?php endforeach ?>#>
 					/>
-					<# rendered = true; #>
 				<label class="setting">
 					<span>SRC</span>
 					<input type="text" disabled="disabled" data-setting="src" value="{{{ data.model.src }}}" />
 				</label>
-				<# } #>
+				<#	}
+					rendered = true;
+				} #>
 				<?php
 				$default_types = wp_get_video_extensions();
 
-				foreach ( $default_types as $type ): ?>
-				<# if ( data.model.<?php echo $type ?> ) { #>
-					<# if ( ! rendered ) { #>
-					<video class="wp-video-shortcode"
+				foreach ( $default_types as $type ):
+				?><# if ( data.model.<?php echo $type ?> ) {
+					if ( ! rendered ) { #>
+					<video controls
+						class="wp-video-shortcode"
 						width="{{{ w }}}"
 						height="{{{ h }}}"
 						src="{{{ data.model.<?php echo $type ?> }}}"
-						<# if ( ! _.isUndefined( data.model.poster ) ) { #>poster="{{{ data.model.poster }}}"<# } #>
-						preload="{{{ _.isUndefined( data.model.preload ) ? 'metadata' : data.model.preload }}}"
-						<# if ( ! _.isUndefined( data.model.autoplay ) && data.model.autoplay ) { #>autoplay<# } #>
-						<# if ( ! _.isUndefined( data.model.loop ) && data.model.loop ) { #>loop<# } #>
+						<?php
+						$props = array( 'poster' => '', 'preload' => 'metadata' );
+						foreach ( $props as $key => $value ):
+							echo $key ?>="{{{ _.isUndefined( data.model.<?php echo $key ?> ) ? '<?php echo $value ?>' : data.model.<?php echo $key ?> }}}"
+						<?php endforeach;
+						?><#
+						<?php foreach ( array( 'autoplay', 'loop' ) as $attr ):
+						?>if ( ! _.isUndefined( data.model.<?php echo $attr ?> ) && data.model.<?php echo $attr ?> ) {
+							#> <?php echo $attr ?><#
+						}
+						<?php endforeach ?>#>
 					/>
-					<#
-						rendered = true;
+					<# rendered = true;
 					} #>
 				<label class="setting">
 					<span><?php echo strtoupper( $type ) ?></span>

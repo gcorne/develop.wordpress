@@ -2173,15 +2173,17 @@ function wp_prepare_attachment_for_js( $attachment ) {
 		'icon'        => wp_mime_type_icon( $attachment->ID ),
 		'dateFormatted' => mysql2date( get_option('date_format'), $attachment->post_date ),
 		'nonces'      => array(
-			'update' => false,
-			'delete' => false,
-			'crop' => false,
+			'update'  => false,
+			'delete'  => false,
+			'edit'    => false,
+			'crop'    => false,
 		),
 		'editLink'   => false,
 	);
 
 	if ( current_user_can( 'edit_post', $attachment->ID ) ) {
 		$response['nonces']['update'] = wp_create_nonce( 'update-post_' . $attachment->ID );
+		$response['nonces']['edit'] = wp_create_nonce( 'image_editor-' . $attachment->ID );
 		$response['editLink'] = get_edit_post_link( $attachment->ID, 'raw' );
 	}
 
@@ -2339,6 +2341,7 @@ function wp_enqueue_media( $args = array() ) {
 		'cancel'      => __( 'Cancel' ),
 		'update'      => __( 'Update' ),
 		'replace'     => __( 'Replace' ),
+		'back'     => __( 'Back' ),
 		/* translators: This is a would-be plural string used in the media manager.
 		   If there is not a word you can use in your language to avoid issues with the
 		   lack of plural support here, turn it into "selected: %d" then translate it.
@@ -2383,7 +2386,8 @@ function wp_enqueue_media( $args = array() ) {
 		// Edit Image
 		'imageDetailsTitle'     => __( 'Image Details' ),
 		'imageReplaceTitle'     => __( 'Replace Image' ),
-		'imageDetailsCancel'     => __( 'Cancel Edit' ),
+		'imageDetailsCancel'    => __( 'Cancel Edit' ),
+		'editImage'             => __( 'Edit Image' ),
 
 		// Crop Image
 		/* translators: title for Media Manager library view */
@@ -2402,12 +2406,12 @@ function wp_enqueue_media( $args = array() ) {
 		/* translators: suggested height of header image in pixels */
 		'suggestedHeight' => __( 'Suggested height is %d pixels.' ),
 
-		// Edit Image
+		// Audio Details
 		'audioDetailsTitle'     => __( 'Audio Details' ),
 		'audioReplaceTitle'     => __( 'Replace Audio' ),
 		'audioDetailsCancel'    => __( 'Cancel Edit' ),
 
-		// Edit Image
+		// Video Details
 		'videoDetailsTitle'     => __( 'Video Details' ),
 		'videoReplaceTitle'     => __( 'Replace Video' ),
 		'videoDetailsCancel'    => __( 'Cancel Edit' ),
@@ -2442,6 +2446,7 @@ function wp_enqueue_media( $args = array() ) {
 
 	wp_enqueue_script( 'media-editor' );
 	wp_enqueue_style( 'media-views' );
+	wp_enqueue_style( 'imgareaselect' );
 	wp_plupload_default_settings();
 
 	require_once ABSPATH . WPINC . '/media-template.php';

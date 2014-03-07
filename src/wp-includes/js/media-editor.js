@@ -274,6 +274,9 @@
 		}
 	};
 
+	/**
+	 * @mixin
+	 */
 	wp.media.mixin = {
 		/**
 		 * A helper function to avoid truthy and falsey values being
@@ -552,6 +555,9 @@
 		}
 	});
 
+	/**
+	 * @namespace
+	 */
 	wp.media.audio = _.extend({
 		defaults : {
 			id : wp.media.view.settings.post.id,
@@ -578,13 +584,13 @@
 		shortcode : function (shortcode) {
 			var self = this;
 
- 			_.each( wp.media.audio.defaults, function( value, key ) {
+			_.each( wp.media.audio.defaults, function( value, key ) {
 				shortcode[ key ] = self.coerce( shortcode, key );
 
- 				if ( value === shortcode[ key ] ) {
- 					delete shortcode[ key ];
+				if ( value === shortcode[ key ] ) {
+					delete shortcode[ key ];
 				}
- 			});
+			});
 
 			return wp.shortcode.string({
 				tag:     'audio',
@@ -593,6 +599,9 @@
 		}
 	}, wp.media.mixin);
 
+	/**
+	 * @namespace
+	 */
 	wp.media.video = _.extend({
 		defaults : {
 			id : wp.media.view.settings.post.id,
@@ -619,13 +628,13 @@
 
 		shortcode : function (shortcode) {
 			var self = this;
- 			_.each( wp.media.video.defaults, function( value, key ) {
+			_.each( wp.media.video.defaults, function( value, key ) {
 				shortcode[ key ] = self.coerce( shortcode, key );
 
- 				if ( value === shortcode[ key ] ) {
- 					delete shortcode[ key ];
+				if ( value === shortcode[ key ] ) {
+					delete shortcode[ key ];
 				}
- 			});
+			});
 
 			return wp.shortcode.string({
 				tag:     'video',
@@ -689,7 +698,7 @@
 
 			this._frame = wp.media({
 				state: 'featured-image',
-				states: [ new wp.media.controller.FeaturedImage() ]
+				states: [ new wp.media.controller.FeaturedImage() , new wp.media.controller.EditImage() ]
 			});
 
 			this._frame.on( 'toolbar:create:featured-image', function( toolbar ) {
@@ -699,6 +708,17 @@
 				this.createSelectToolbar( toolbar, {
 					text: wp.media.view.l10n.setFeaturedImage
 				});
+			}, this._frame );
+
+			this._frame.on( 'content:render:edit-image', function() {
+				var selection = this.state('featured-image').get('selection'),
+					view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
+
+				this.content.set( view );
+
+				// after bringing in the frame, load the actual editor via an ajax call
+				view.loadEditor();
+
 			}, this._frame );
 
 			this._frame.state('featured-image').on( 'select', this.select );
