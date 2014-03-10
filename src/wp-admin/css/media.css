@@ -241,17 +241,17 @@
 	top: 30px;
 	bottom: 30px;
 	left: 50%;
-	z-index: 160000;
+	z-index: 100105;
 }
 
 .find-box-head {
 	background: #fcfcfc;
 	border-bottom: 1px solid #dfdfdf;
-	height: 56px;
+	height: 42px;
 	font-size: 22px;
 	font-weight: 600;
-	line-height: 56px;
-	padding: 0 40px 0 16px;
+	line-height: 41px;
+	padding: 0 42px 0 16px;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -263,8 +263,8 @@
 	padding: 16px;
 	background-color: #fff;
 	position: absolute;
-	top: 57px;
-	bottom: 57px;
+	top: 43px;
+	bottom: 45px;
 	overflow-y: scroll;
 	width: 100%;
 	-webkit-box-sizing: border-box;
@@ -300,8 +300,8 @@
 }
 
 #find-posts-close {
-	width: 40px;
-	height: 40px;
+	width: 42px;
+	height: 42px;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -315,7 +315,7 @@
 }
 
 #find-posts-close:before {
-	font: normal 20px/40px 'dashicons';
+	font: normal 20px/42px 'dashicons';
 	vertical-align: top;
 	speak: none;
 	-webkit-font-smoothing: antialiased;
@@ -324,13 +324,19 @@
 }
 
 .find-box-buttons {
-	padding: 14px 16px;
+	padding: 8px 16px;
 	background: #fcfcfc;
 	border-top: 1px solid #dfdfdf;
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	right: 0;
+}
+
+@media screen and ( max-width: 782px ) {
+	.find-box-inside {
+		bottom: 57px;
+	}
 }
 
 @media screen and ( max-width: 660px ) {
@@ -344,9 +350,6 @@
 		width: 100%;
 	}
 
-	.find-box-inside {
-		bottom: 69px;
-	}
 }
 
 .ui-find-overlay {
@@ -357,7 +360,7 @@
 	bottom: 0;
 	background: #000;
 	opacity: 0.7;
-	z-index: 159900;
+	z-index: 100100;
 }
 
 ul#dismissed-updates {

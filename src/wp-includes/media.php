@@ -183,19 +183,30 @@ function image_downsize($id, $size = 'medium') {
 /**
  * Register a new image size.
  *
+ * Cropping behavior for the image size is dependent on the value of $crop:
+ * 1. If false (default), images will be scaled, not cropped.
+ * 2. If an array in the form of array( x_crop_position, y_crop_position ):
+ *    - x_crop_position accepts 'left' 'center', or 'right'.
+ *    - y_crop_position accepts 'top', 'center', or 'bottom'.
+ *    Images will be cropped to the specified dimensions within the defined crop area.
+ * 3. If true, images will be cropped to the specified dimensions using center positions.
+ *
  * @since 2.9.0
  *
- * @param string $name   The image size name.
- * @param int    $width  The image's width.
- * @param int    $height The image's width.
- * @param bool   $width  Whether to crop the image to fit the dimensions. Default false.
+ * @param string     $name   Image size identifier.
+ * @param int        $width  Image width in pixels.
+ * @param int        $height Image height in pixels.
+ * @param bool|array $crop   Optional. Whether to crop images to specified height and width or resize.
+ *                           An array can specify positioning of the crop area. Default false.
+ * @return bool|array False, if no image was created. Metadata array on success.
  */
 function add_image_size( $name, $width = 0, $height = 0, $crop = false ) {
 	global $_wp_additional_image_sizes;
+
 	$_wp_additional_image_sizes[ $name ] = array(
 		'width'  => absint( $width ),
 		'height' => absint( $height ),
-		'crop'   => (bool) $crop,
+		'crop'   => $crop,
 	);
 }
 
@@ -233,9 +244,16 @@ function remove_image_size( $name ) {
 }
 
 /**
- * Registers an image size for the post thumbnail
+ * Registers an image size for the post thumbnail.
  *
  * @since 2.9.0
+ * @see add_image_size() for details on cropping behavior.
+ *
+ * @param int        $width  Image width in pixels.
+ * @param int        $height Image height in pixels.
+ * @param bool|array $crop   Optional. Whether to crop images to specified height and width or resize.
+ *                           An array can specify positioning of the crop area. Default false.
+ * @return bool|array False, if no image was created. Metadata array on success.
  */
 function set_post_thumbnail_size( $width = 0, $height = 0, $crop = false ) {
 	add_image_size( 'post-thumbnail', $width, $height, $crop );
@@ -342,22 +360,30 @@ function wp_constrain_dimensions( $current_width, $current_height, $max_width=0,
 }
 
 /**
- * Retrieve calculated resized dimensions for use in WP_Image_Editor.
+ * Retrieve calculated resize dimensions for use in WP_Image_Editor.
  *
- * Calculate dimensions and coordinates for a resized image that fits within a
- * specified width and height. If $crop is true, the largest matching central
- * portion of the image will be cropped out and resized to the required size.
+ * Calculates dimensions and coordinates for a resized image that fits
+ * within a specified width and height.
+ *
+ * Cropping behavior is dependent on the value of $crop:
+ * 1. If false (default), images will not be cropped.
+ * 2. If an array in the form of array( x_crop_position, y_crop_position ):
+ *    - x_crop_position accepts 'left' 'center', or 'right'.
+ *    - y_crop_position accepts 'top', 'center', or 'bottom'.
+ *    Images will be cropped to the specified dimensions within the defined crop area.
+ * 3. If true, images will be cropped to the specified dimensions using center positions.
  *
  * @since 2.5.0
- * @uses apply_filters() Calls 'image_resize_dimensions' on $orig_w, $orig_h, $dest_w, $dest_h and
- *		$crop to provide custom resize dimensions.
+ * @uses apply_filters() Calls 'image_resize_dimensions' on $orig_w, $orig_h, $dest_w,
+ *                       $dest_h and $crop to provide custom resize dimensions.
  *
- * @param int $orig_w Original width.
- * @param int $orig_h Original height.
- * @param int $dest_w New width.
- * @param int $dest_h New height.
- * @param bool $crop Optional, default is false. Whether to crop image or resize.
- * @return bool|array False on failure. Returned array matches parameters for imagecopyresampled() PHP function.
+ * @param int        $orig_w Original width in pixels.
+ * @param int        $orig_h Original height in pixels.
+ * @param int        $dest_w New width in pixels.
+ * @param int        $dest_h New height in pixels.
+ * @param bool|array $crop   Optional. Whether to crop image to specified height and width or resize.
+ *                           An array can specify positioning of the crop area. Default false.
+ * @return bool|array False on failure. Returned array matches parameters for `imagecopyresampled()`.
  */
 function image_resize_dimensions($orig_w, $orig_h, $dest_w, $dest_h, $crop = false) {
 
@@ -391,8 +417,27 @@ function image_resize_dimensions($orig_w, $orig_h, $dest_w, $dest_h, $crop = fal
 		$crop_w = round($new_w / $size_ratio);
 		$crop_h = round($new_h / $size_ratio);
 
-		$s_x = floor( ($orig_w - $crop_w) / 2 );
-		$s_y = floor( ($orig_h - $crop_h) / 2 );
+		if ( ! is_array( $crop ) || count( $crop ) !== 2 ) {
+			$crop = array( 'center', 'center' );
+		}
+
+		list( $x, $y ) = $crop;
+
+		if ( 'left' === $x ) {
+			$s_x = 0;
+		} elseif ( 'right' === $x ) {
+			$s_x = $orig_w - $crop_w;
+		} else {
+			$s_x = floor( ( $orig_w - $crop_w ) / 2 );
+		}
+
+		if ( 'top' === $y ) {
+			$s_y = 0;
+		} elseif ( 'bottom' === $y ) {
+			$s_y = $orig_h - $crop_h;
+		} else {
+			$s_y = floor( ( $orig_h - $crop_h ) / 2 );
+		}
 	} else {
 		// don't crop, just resize using $dest_w x $dest_h as a maximum bounding box
 		$crop_w = $orig_w;
@@ -954,6 +999,55 @@ function gallery_shortcode( $attr ) {
 }
 
 /**
+ * Output and enqueue default scripts and styles for playlists.
+ *
+ * @since 3.9.0
+ *
+ * @param string $type Type of playlist: "audio" or "video."
+ */
+function wp_playlist_scripts( $type ) {
+	wp_enqueue_style( 'wp-mediaelement' );
+	wp_enqueue_script( 'wp-playlist' );
+?>
+<!--[if lt IE 9]><script>document.createElement('<?php echo esc_js( $type ) ?>');</script><![endif]-->
+<script type="text/html" id="tmpl-wp-playlist-current-item">
+	<# if ( data.image ) { #>
+	<img src="{{{ data.thumb.src }}}"/>
+	<# } #>
+	<# if ( data.meta.title ) { #>
+	<div class="wp-playlist-caption">
+		<span class="wp-caption-meta wp-caption-title">&#8220;{{{ data.meta.title }}}&#8221;</span>
+		<span class="wp-caption-meta wp-caption-album">{{{ data.meta.album }}}</span>
+		<span class="wp-caption-meta wp-caption-artist">{{{ data.meta.artist }}}</span>
+	</div>
+	<# } else { #>
+	<div class="wp-playlist-caption">{{{ data.caption ? data.caption : data.title }}}</div>
+	<# } #>
+</script>
+<script type="text/html" id="tmpl-wp-playlist-item">
+	<div class="wp-playlist-item">
+		<# if ( ( data.title || data.meta.title ) && ( ! data.artists || data.meta.artist ) ) { #>
+		<div class="wp-playlist-caption">
+			{{{ data.index ? ( data.index + '.&nbsp;' ) : '' }}}
+			<span class="wp-caption-title">&#8220;{{{ data.title ? data.title : data.meta.title }}}&#8221;</span>
+			<# if ( data.artists ) { #>
+			<span class="wp-caption-by"><?php _e( 'by' ) ?></span>
+			<span class="wp-caption-artist">{{{ data.meta.artist }}}</span>
+			<# } #>
+		</div>
+		<# } else { #>
+		<div class="wp-playlist-caption">{{{ data.index ? ( data.index + '.' ) : '' }}} {{{ data.caption ? data.caption : data.title }}}</div>
+		<# } #>
+		<# if ( data.meta.length_formatted ) { #>
+		<div class="wp-playlist-item-length">{{{ data.meta.length_formatted }}}</div>
+		<# } #>
+	</div>
+</script>
+<?php
+}
+add_action( 'wp_playlist_scripts', 'wp_playlist_scripts' );
+
+/**
  * The Playlist shortcode.
  *
  * This implements the functionality of the Playlist Shortcode for displaying
@@ -1029,7 +1123,21 @@ function wp_get_playlist( $attr, $type ) {
 		$orderby = 'none';
 	}
 
-	if ( ! in_array( $style, array( 'light', 'dark' ), true ) ) {
+	$playlist_styles = array(
+		'light' => _x( 'Light', 'light playlist theme' ),
+		'dark'	=> _x( 'Dark', 'dark playlist theme' )
+	);
+
+	/**
+	 * Filter the available playlist styles.
+	 *
+	 * @since 3.9.0
+	 *
+	 * @param array $playlist_styles Array of playlist styles. Defaults are 'light' and 'dark'.
+	 */
+	$styles = apply_filters( 'playlist_styles', $playlist_styles );
+
+	if ( ! in_array( $style, array_keys( $styles ), true ) ) {
 		$style = 'light';
 	}
 
@@ -1150,45 +1258,17 @@ function wp_get_playlist( $attr, $type ) {
 
 	ob_start();
 
-	if ( 1 === $instance ):
-		wp_enqueue_style( 'wp-mediaelement' );
-		wp_enqueue_script( 'wp-playlist' );
-?>
-<!--[if lt IE 9]><script>document.createElement('<?php echo esc_js( $type ) ?>');</script><![endif]-->
-<script type="text/html" id="tmpl-wp-playlist-current-item">
-	<# if ( data.image ) { #>
-	<img src="{{{ data.thumb.src }}}"/>
-	<# } #>
-	<# if ( data.meta.title ) { #>
-	<div class="wp-playlist-caption">
-		<span class="wp-caption-meta wp-caption-title">&#8220;{{{ data.meta.title }}}&#8221;</span>
-		<span class="wp-caption-meta wp-caption-album">{{{ data.meta.album }}}</span>
-		<span class="wp-caption-meta wp-caption-artist">{{{ data.meta.artist }}}</span>
-	</div>
-	<# } else { #>
-	<div class="wp-playlist-caption">{{{ data.caption ? data.caption : data.title }}}</div>
-	<# } #>
-</script>
-<script type="text/html" id="tmpl-wp-playlist-item">
-	<div class="wp-playlist-item">
-		<# if ( ( data.title || data.meta.title ) && ( ! data.artists || data.meta.artist ) ) { #>
-		<div class="wp-playlist-caption">
-			{{{ data.index ? ( data.index + '.&nbsp;' ) : '' }}}
-			<span class="wp-caption-title">&#8220;{{{ data.title ? data.title : data.meta.title }}}&#8221;</span>
-			<# if ( data.artists ) { #>
-			<span class="wp-caption-by"><?php _e( 'by' ) ?></span>
-			<span class="wp-caption-artist">{{{ data.meta.artist }}}</span>
-			<# } #>
-		</div>
-		<# } else { #>
-		<div class="wp-playlist-caption">{{{ data.index ? ( data.index + '.' ) : '' }}} {{{ data.caption ? data.caption : data.title }}}</div>
-		<# } #>
-		<# if ( data.meta.length_formatted ) { #>
-		<div class="wp-playlist-item-length">{{{ data.meta.length_formatted }}}</div>
-		<# } #>
-	</div>
-</script>
-	<?php endif ?>
+	if ( 1 === $instance ) {
+		/**
+		 * Hook to print and enqueue playlist scripts, styles, and JavaScript templates.
+		 *
+		 * @since 3.9.0
+		 *
+		 * @param string $type   Type of playlist: "audio" or "video."
+		 * @param string $style  The "theme" for the playlist. Core provides "light" and "dark."
+		 */
+		do_action( 'wp_playlist_scripts', $type, $style );
+	} ?>
 <div class="wp-playlist wp-<?php echo $safe_type ?>-playlist wp-playlist-<?php echo $safe_style ?>">
 	<?php if ( 'audio' === $type ): ?>
 	<div class="wp-playlist-current-item"></div>
@@ -1201,14 +1281,11 @@ function wp_get_playlist( $attr, $type ) {
 	<div class="wp-playlist-next"></div>
 	<div class="wp-playlist-prev"></div>
 	<noscript>
-	<?php
-	$output = "\n";
+	<ol><?php
 	foreach ( $attachments as $att_id => $attachment ) {
-		$output .= wp_get_attachment_link( $att_id ) . "\n";
+		printf( '<li>%s</li>', wp_get_attachment_link( $att_id ) );
 	}
-
-	echo $output;
-	?>
+	?></ol>
 	</noscript>
 	<script type="application/json"><?php echo json_encode( $data ) ?></script>
 </div>
@@ -2301,6 +2378,18 @@ function wp_enqueue_media( $args = array() ) {
 		'size'  => get_option( 'image_default_size' ),  // empty default
 	);
 
+	$exts = array_merge( wp_get_audio_extensions(), wp_get_video_extensions() );
+	$mimes = get_allowed_mime_types();
+	$ext_mimes = array();
+	foreach ( $exts as $ext ) {
+		foreach ( $mimes as $ext_preg => $mime_match ) {
+			if ( preg_match( '#' . $ext . '#i', $ext_preg ) ) {
+				$ext_mimes[ $ext ] = $mime_match;
+				break;
+			}
+		}
+	}
+
 	$settings = array(
 		'tabs'      => $tabs,
 		'tabUrl'    => add_query_arg( array( 'chromeless' => true ), admin_url('media-upload.php') ),
@@ -2313,7 +2402,8 @@ function wp_enqueue_media( $args = array() ) {
 			'id' => 0,
 		),
 		'defaultProps' => $props,
-		'embedExts'    => array_merge( wp_get_audio_extensions(), wp_get_video_extensions() ),
+		'embedExts'    => $exts,
+		'embedMimes'   => $ext_mimes
 	);
 
 	$post = null;
@@ -2341,7 +2431,8 @@ function wp_enqueue_media( $args = array() ) {
 		'cancel'      => __( 'Cancel' ),
 		'update'      => __( 'Update' ),
 		'replace'     => __( 'Replace' ),
-		'back'     => __( 'Back' ),
+		'remove'      => __( 'Remove' ),
+		'back'        => __( 'Back' ),
 		/* translators: This is a would-be plural string used in the media manager.
 		   If there is not a word you can use in your language to avoid issues with the
 		   lack of plural support here, turn it into "selected: %d" then translate it.
@@ -2406,15 +2497,23 @@ function wp_enqueue_media( $args = array() ) {
 		/* translators: suggested height of header image in pixels */
 		'suggestedHeight' => __( 'Suggested height is %d pixels.' ),
 
-		// Audio Details
+		// Edit Audio
 		'audioDetailsTitle'     => __( 'Audio Details' ),
 		'audioReplaceTitle'     => __( 'Replace Audio' ),
+		'audioAddSourceTitle'   => __( 'Add Audio Source' ),
 		'audioDetailsCancel'    => __( 'Cancel Edit' ),
+		'audioDetailsText'      => __( '"Replace Audio" will remove all associated source files when you update. ' .
+			'"Add Audio Source" allows you to specify alternate sources for maximum native HTML5 audio playback.' ),
 
-		// Video Details
+		// Edit Video
 		'videoDetailsTitle'     => __( 'Video Details' ),
 		'videoReplaceTitle'     => __( 'Replace Video' ),
+		'videoAddSourceTitle'   => __( 'Add Video Source' ),
 		'videoDetailsCancel'    => __( 'Cancel Edit' ),
+		'videoDetailsText'      => __( '"Replace Video" will remove all associated source files when you update. ' .
+			'"Add Video Source" allows you to specify alternate sources for maximum native HTML5 video playback.' ),
+		'videoSelectPosterImageTitle' => _( 'Select Poster Image' ),
+		'videoAddTrackTitle'	=> __( 'Add Subtitles' ),
 
  		// Playlist
  		'playlistDragInfo'    => __( 'Drag and drop to reorder tracks.' ),

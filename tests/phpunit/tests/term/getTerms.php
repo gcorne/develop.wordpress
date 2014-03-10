@@ -165,9 +165,6 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$term_id2 = $this->factory->category->create();
 		$term_id22 = $this->factory->category->create( array( 'parent' => $term_id2 ) );
 
-		// There's something else broken in the cache cleaning routines that leads to this having to be done manually
-		delete_option( 'category_children' );
-
 		$terms = get_terms( 'category', array(
 			'exclude' => $term_id_uncategorized,
 			'fields' => 'ids',
@@ -276,7 +273,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$cranberries = $this->factory->term->create( array( 'name' => 'Cranberries', 'parent' => $fruit, 'taxonomy' => $tax ) );
 
 		$terms = get_terms( $tax, array( 'parent' => 0, 'cache_domain' => $tax ) );
-		$this->assertNotEmpty( $terms );
+		$this->assertEquals( 2, count( $terms ) );
 		$this->assertEquals( wp_list_pluck( $terms, 'name' ), array( 'Cheese', 'Crackers' ) );
 	}
 
@@ -296,7 +293,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( 1, $term->count );
 
 		$terms = get_terms( $tax, array( 'parent' => 0, 'cache_domain' => $tax ) );
-		$this->assertNotEmpty( $terms );
+		$this->assertEquals( 1, count( $terms ) );
 		$this->assertEquals( array( 'Cheese' ), wp_list_pluck( $terms, 'name' ) );
 
 		_unregister_taxonomy( $tax );
@@ -320,9 +317,20 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( 1, $term->count );
 
 		$terms = get_terms( $tax, array( 'parent' => 0, 'cache_domain' => $tax ) );
-		$this->assertNotEmpty( $terms );
+		$this->assertEquals( 1, count( $terms ) );
 		$this->assertEquals( array( 'term1' ), wp_list_pluck( $terms, 'name' ) );
 
 		_unregister_taxonomy( $tax );
+	}
+
+	/**
+	 * @ticket 27123
+	 */
+	function test_get_terms_child_of() {
+		$parent = $this->factory->category->create();
+		$child = $this->factory->category->create( array( 'parent' => $parent ) );
+
+		$terms = get_terms( 'category', array( 'child_of' => $parent, 'hide_empty' => false ) );
+		$this->assertEquals( 1, count( $terms ) );
 	}
 }
