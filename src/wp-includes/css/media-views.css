@@ -1669,6 +1669,10 @@
 	margin: 10px 0;
 }
 
+.image-details .hidden {
+	display: none;
+}
+
 .media-embed .setting input[type="text"],
 .media-embed .setting textarea {
 	display: block;
@@ -1707,10 +1711,6 @@
 .advanced,
 .link-settings {
 	margin-top: 10px;
-}
-
-.advanced .hidden {
-	display: none;
 }
 
 /* Drag & drop on the editor upload */
