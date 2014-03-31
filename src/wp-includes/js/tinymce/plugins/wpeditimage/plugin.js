@@ -114,7 +114,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 	}
 
 	function extractImageData( imageNode ) {
-		var classes, metadata, captionBlock, caption, link,
+		var classes, extraClasses, metadata, captionBlock, caption, link,
 			dom = editor.dom;
 
 		// default attributes
@@ -127,13 +127,13 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			caption: '',
 			alt: '',
 			align: 'none',
+			extraClasses: '',
 			link: false,
 			linkUrl: '',
 			linkClassName: '',
 			linkTargetBlank: false,
 			linkRel: '',
-			title: '',
-			className: ''
+			title: ''
 		};
 
 		metadata.url = dom.getAttrib( imageNode, 'src' );
@@ -141,23 +141,25 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 		metadata.title = dom.getAttrib( imageNode, 'title' );
 		metadata.width = parseInt( dom.getAttrib( imageNode, 'width' ), 10 );
 		metadata.height = parseInt( dom.getAttrib( imageNode, 'height' ), 10 );
-		metadata.className = imageNode.className;
 
-		classes = metadata.className.split( ' ' );
+		classes = tinymce.explode( imageNode.className, ' ' );
+		extraClasses = [];
+
 		tinymce.each( classes, function( name ) {
 
 			if ( /^wp-image/.test( name ) ) {
 				metadata.attachment_id = parseInt( name.replace( 'wp-image-', '' ), 10 );
-			}
-
-			if ( /^align/.test( name ) ) {
+			} else if ( /^align/.test( name ) ) {
 				metadata.align = name.replace( 'align', '' );
+			} else if ( /^size/.test( name ) ) {
+				metadata.size = name.replace( 'size-', '' );
+			} else {
+				extraClasses.push( name );
 			}
 
-			if ( /^size/.test( name ) ) {
-				metadata.size = name.replace( 'size-', '' );
-			}
 		} );
+
+		metadata.extraClasses = extraClasses.join( ' ' );
 
 		// Extract caption
 		captionBlock = dom.getParents( imageNode, '.wp-caption' );
@@ -251,7 +253,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 	}
 
 	function createImageAndLink( imageData, mode ) {
-		var classes = [],
+		var classes = tinymce.explode( imageData.extraClasses, ' ' ),
 			attrs, linkAttrs;
 
 		mode = mode ? mode : 'node';

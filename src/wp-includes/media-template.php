@@ -663,6 +663,10 @@ function wp_print_media_templates() {
 								<span><?php _e('Title Attribute'); ?></span>
 								<input type="text" data-setting="title" value="{{ data.model.title }}" />
 							</label>
+							<label class="setting extra-classes">
+								<span><?php _e('CSS Class'); ?></span>
+								<input type="text" data-setting="extraClasses" value="{{ data.model.extraClasses }}" />
+							</label>
 						</div>
 					</div>
 
@@ -757,7 +761,7 @@ function wp_print_media_templates() {
 				</div>
 				<div class="column-image">
 					<div class="image">
-						<img src="{{ data.model.url }}" draggable="false" />
+						<img src="{{ data.model.url }}" width="{{ data.model.width }}" height="{{ data.model.height }}" draggable="false" />
 					</div>
 					<# if ( data.attachment && window.imageEdit ) { #>
 						<div class="actions">
