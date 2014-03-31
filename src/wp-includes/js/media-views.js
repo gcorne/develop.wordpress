@@ -6066,7 +6066,6 @@
 			this.options.attachment = this.model.attachment;
 			this.listenTo( this.model, 'change:url', this.updateUrl );
 			this.listenTo( this.model, 'change:link', this.toggleLinkSettings );
-			this.listenTo( this.model, 'change:size', this.updateUrl );
 			media.view.Settings.AttachmentDisplay.prototype.initialize.apply( this, arguments );
 		},
 
@@ -6112,9 +6111,7 @@
 		},
 
 		updateUrl: function() {
-			this.$( '.image img' ).attr( 'src', this.model.get( 'url' ) )
-				.attr( 'width', this.model.get( 'width' ) )
-				.attr( 'height', this.model.get( 'height' ) );
+			this.$( '.image img' ).attr( 'src', this.model.get( 'url' ) );
 			this.$( '.url' ).val( this.model.get( 'url' ) );
 		},
 

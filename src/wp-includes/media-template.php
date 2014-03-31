@@ -761,7 +761,7 @@ function wp_print_media_templates() {
 				</div>
 				<div class="column-image">
 					<div class="image">
-						<img src="{{ data.model.url }}" width="{{ data.model.width }}" height="{{ data.model.height }}" draggable="false" />
+						<img src="{{ data.model.url }}" draggable="false" />
 					</div>
 					<# if ( data.attachment && window.imageEdit ) { #>
 						<div class="actions">
