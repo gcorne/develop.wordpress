@@ -197,7 +197,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 
 	function updateImage( imageNode, imageData ) {
 		var classes, className, width, node, html,
-			captionNode, dd, dl, id, attrs, linkAttrs,
+			captionNode, dd, dl, dt, id, attrs, linkAttrs,
 			dom = editor.dom;
 
 		classes = tinymce.explode( imageData.extraClasses, ' ' );
@@ -246,8 +246,9 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			dom.outerHTML( imageNode, html );
 		}
 
+		captionNode = editor.dom.getParent( imageNode, '.mceTemp' );
+
 		if ( imageData.caption ) {
-			captionNode = editor.dom.getParent( imageNode, '.mceTemp' );
 			width = parseInt( imageData.width, 10 );
 			id = imageData.attachment_id ? 'id="attachment_'+ imageData.attachment_id +'" ' : '';
 			className = 'wp-caption align' + imageData.align;
@@ -257,6 +258,7 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			}
 
 			if ( captionNode ) {
+
 				dl = dom.select( 'dl.wp-caption', captionNode );
 
 				if ( dl.length ) {
@@ -285,6 +287,26 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 				html =  '<div class="mceTemp"><dl ' + id + 'class="' + className +'" style="width: '+ width +'px">' +
 					'<dt class="wp-caption-dt">'+ dom.getOuterHTML( node ) + '</dt><dd class="wp-caption-dd">'+ imageData.caption +'</dd></dl></div>';
 				dom.setOuterHTML( node, html );
+			}
+		} else {
+			if ( captionNode ) {
+
+				dl = dom.select( 'dl.wp-caption', captionNode );
+				dd = dom.select( 'dd.wp-caption-dd', captionNode );
+				dt = dom.select( 'dt.wp-caption-dt', captionNode );
+				if ( dd.length ) {
+					dom.remove( dd[0] );
+				}
+
+				if ( dt.length ) {
+					dom.remove( dt[0], true );
+				}
+
+				if ( dl.length ) {
+					dom.remove( dl[0], true );
+				}
+
+				dom.remove( captionNode, true );
 			}
 		}
 
