@@ -1607,26 +1607,29 @@
 	padding: 0;
 }
 
-.image-details .column-settings,
-.image-details .column-image {
-	padding: 20px;
-}
-
 .image-details .column-settings {
 	background: #F3F3F3;
 	min-height: 100%;
 	width: 52%;
-	padding-top: 0;
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 
+.image-details .column-settings h3 {
+	padding: 20px 0 0 20px;
+	border-top: 1px solid #ddd;
+}
+
 .image-details .column-image {
-	width: 40%;
+	width: 48%;
 	position: absolute;
-	left: 56%;
+	left: 52%;
 	top: 0;
+}
+
+.image-details .image {
+	margin: 20px;
 }
 
 .image-details .image img {
@@ -1638,19 +1641,24 @@
 	font-style: italic;
 	color: #666;
 	text-decoration: none;
+	margin: 20px;
+	display: block;
 }
 
 .image-details .advanced-toggle::after {
 	font: normal 20px/1 'dashicons';
-	vertical-align: top;
 	speak: none;
+	vertical-align: top;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	content: '\f140';
+	display: inline-block;
+	margin-top: -2px;
 }
 
 .image-details .advanced-visible .advanced-toggle::after {
 	content: '\f142';
+	margin-top: 0;
 }
 
 .media-embed .thumbnail {
@@ -1715,8 +1723,12 @@
 
 .image-details .setting input.link-to-custom,
 .image-details .link-target {
-	margin-left: 26%;
+	margin-left: 27%;
 	width: 70%;
+}
+
+.image-details .link-target {
+	margin-top: 24px;
 }
 
 .media-embed .setting input.hidden {
@@ -1735,7 +1747,8 @@
 	float: left;
 	width: 25%;
 	text-align: right;
-	margin: 4px 1% 0 0;
+	margin: 4px 1% 0 1%;
+	line-height: 1.1;
 }
 
 .media-embed .setting .button-group {
@@ -1970,6 +1983,27 @@
 		right: 30px;
 	}
 
+	.image-details .setting {
+		margin: 20px;
+	}
+
+	.image-details .setting span {
+		float: none;
+		text-align: left;
+		width: 100%;
+	}
+
+	.image-details .setting input.link-to-custom,
+	.image-details .setting input[type="text"],
+	.image-details .setting textarea {
+		width: 100%;
+		margin-left: 0;
+	}
+
+	.image-details .link-target {
+		width: 100%;
+	}
+
 	.media-selection {
 		min-width: 120px;
 	}
@@ -2177,7 +2211,9 @@
 
 	.image-details .column-settings,
 	.image-details .column-image {
-		float: none;
+		position: relative;
+		padding-top: 10px;
+		left: 0;
 		width: 100%;
 	}
 

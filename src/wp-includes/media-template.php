@@ -644,13 +644,14 @@ function wp_print_media_templates() {
 				<div class="column-image">
 					<div class="image">
 						<img src="{{ data.model.url }}" draggable="false" />
+
+						<# if ( data.attachment && window.imageEdit ) { #>
+							<div class="actions">
+								<input type="button" class="edit-attachment button" value="<?php esc_attr_e( 'Edit Original' ); ?>" />
+								<input type="button" class="replace-attachment button" value="<?php esc_attr_e( 'Replace' ); ?>" />
+							</div>
+						<# } #>
 					</div>
-					<# if ( data.attachment && window.imageEdit ) { #>
-						<div class="actions">
-							<input type="button" class="edit-attachment button" value="<?php esc_attr_e( 'Edit Original' ); ?>" />
-							<input type="button" class="replace-attachment button" value="<?php esc_attr_e( 'Replace' ); ?>" />
-						</div>
-					<# } #>
 				</div>
 				<div class="column-settings">
 					<?php
@@ -720,30 +721,29 @@ function wp_print_media_templates() {
 
 					<div class="setting link-to">
 						<span><?php _e('Link To'); ?></span>
-						<div class="button-group button-large" data-setting="link">
+						<select data-setting="link">
 						<# if ( data.attachment ) { #>
-							<button class="button" value="file">
+							<option value="file">
 								<?php esc_attr_e('Media File'); ?>
-							</button>
-							<button class="button" value="post">
+							</option>
+							<option value="post">
 								<?php esc_attr_e('Attachment Page'); ?>
-							</button>
+							</option>
 						<# } else { #>
-							<button class="button" value="file">
+							<option value="file">
 								<?php esc_attr_e('Image URL'); ?>
-							</button>
+							</option>
 						<# } #>
-							<button class="button" value="custom">
+							<option value="custom">
 								<?php esc_attr_e('Custom URL'); ?>
-							</button>
-							<button class="button active" value="none">
+							</option>
+							<option value="none">
 								<?php esc_attr_e('None'); ?>
-							</button>
-						</div>
+							</option>
+						</select>
 						<input type="text" class="link-to-custom" data-setting="linkUrl" />
 					</div>
 					<div class="advanced">
-
 						<a class="advanced-toggle" href="#"><?php _e('Show advanced options'); ?></a>
 						<div class="hidden">
 							<label class="setting title-text">
