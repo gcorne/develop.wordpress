@@ -258,6 +258,10 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 
 		mode = mode ? mode : 'node';
 
+		if ( ! classes ) {
+			classes = [];
+		}
+
 		if ( ! imageData.caption ) {
 			classes.push( 'align' + imageData.align );
 		}
