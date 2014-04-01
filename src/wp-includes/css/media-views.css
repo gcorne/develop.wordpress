@@ -1694,7 +1694,7 @@
 	clear: both;
 }
 
-.image-details .setting {
+.image-details .embed-media-settings .setting {
 	float: none;
 	width: auto;
 }
@@ -1715,19 +1715,19 @@
 	margin: 1px 0;
 }
 
-.image-details .setting input[type="text"],
-.image-details .setting textarea {
+.image-details .embed-media-settings .setting input[type="text"],
+.image-details .embed-media-settings .setting textarea {
 	max-width: inherit;
 	width: 70%;
 }
 
-.image-details .setting input.link-to-custom,
-.image-details .link-target {
+.image-details .embed-media-settings .setting input.link-to-custom,
+.image-details .embed-media-settings .link-target {
 	margin-left: 27%;
 	width: 70%;
 }
 
-.image-details .link-target {
+.image-details .embed-media-settings .link-target {
 	margin-top: 24px;
 }
 
@@ -1743,7 +1743,7 @@
 	color: #666;
 }
 
-.image-details .setting span {
+.image-details .embed-media-settings .setting span {
 	float: left;
 	width: 25%;
 	text-align: right;
@@ -1983,20 +1983,20 @@
 		right: 30px;
 	}
 
-	.image-details .setting {
+	.image-details .embed-media-settings .setting {
 		margin: 20px;
 	}
 
-	.image-details .setting span {
+	.image-details .embed-media-settings .setting span {
 		float: none;
 		text-align: left;
 		width: 100%;
 		margin-bottom: 4px;
 	}
 
-	.image-details .setting input.link-to-custom,
-	.image-details .setting input[type="text"],
-	.image-details .setting textarea {
+	.image-details .embed-media-settings .setting input.link-to-custom,
+	.image-details .embed-media-settings .setting input[type="text"],
+	.image-details .embed-media-settings .setting textarea {
 		width: 100%;
 		margin-left: 0;
 	}
