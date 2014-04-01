@@ -270,7 +270,8 @@
 	width: 100%;
 }
 
-.media-sidebar h3 {
+.media-sidebar h3,
+.image-details h3 {
 	position: relative;
 	font-weight: bold;
 	text-transform: uppercase;
@@ -1603,23 +1604,29 @@
 .image-details .embed-media-settings {
 	top: 0;
 	overflow: visible;
+	padding: 0;
+}
+
+.image-details .column-settings,
+.image-details .column-image {
+	padding: 20px;
 }
 
 .image-details .column-settings {
-	width: 44%;
-	float: left;
-	margin-right: 20px;
+	background: #F3F3F3;
+	min-height: 100%;
+	width: 52%;
+	padding-top: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .image-details .column-image {
-	width: 53%;
-	float: left;
-}
-
-.image-details .column-image:after {
-    content: '';
-	display: table;
-    clear: both;
+	width: 40%;
+	position: absolute;
+	left: 56%;
+	top: 0;
 }
 
 .image-details .image img {
@@ -1627,6 +1634,24 @@
 	max-height: 500px;
 }
 
+.image-details .advanced-toggle {
+	font-style: italic;
+	color: #666;
+	text-decoration: none;
+}
+
+.image-details .advanced-toggle::after {
+	font: normal 20px/1 'dashicons';
+	vertical-align: top;
+	speak: none;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: '\f140';
+}
+
+.image-details .advanced-visible .advanced-toggle::after {
+	content: '\f142';
+}
 
 .media-embed .thumbnail {
 	max-width: 100%;
@@ -1663,6 +1688,7 @@
 
 .image-details .setting {
 	float: none;
+	width: auto;
 }
 
 .image-details .actions {
@@ -1684,6 +1710,13 @@
 .image-details .setting input[type="text"],
 .image-details .setting textarea {
 	max-width: inherit;
+	width: 70%;
+}
+
+.image-details .setting input.link-to-custom,
+.image-details .link-target {
+	margin-left: 26%;
+	width: 70%;
 }
 
 .media-embed .setting input.hidden {
@@ -1696,6 +1729,13 @@
 	font-size: 13px;
 	line-height: 24px;
 	color: #666;
+}
+
+.image-details .setting span {
+	float: left;
+	width: 25%;
+	text-align: right;
+	margin: 4px 1% 0 0;
 }
 
 .media-embed .setting .button-group {
@@ -2140,6 +2180,7 @@
 		float: none;
 		width: 100%;
 	}
+
 
 	/* Gallery */
 	.media-frame.hide-router .media-frame-content {
