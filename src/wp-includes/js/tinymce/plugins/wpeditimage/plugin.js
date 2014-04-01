@@ -196,67 +196,11 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 	}
 
 	function updateImage( imageNode, imageData ) {
-		var className, width, node, html, captionNode, nodeToReplace, uid, editedImg, id;
+		var classes, className, width, node, html,
+			captionNode, dd, dl, id, attrs, linkAttrs,
+			dom = editor.dom;
 
-		if ( imageData.caption ) {
-
-			html = createImageAndLink( imageData, 'html' );
-
-			width = parseInt( imageData.width, 10 );
-
-			if ( ! editor.getParam( 'wpeditimage_html5_captions' ) ) {
-				width += 10;
-			}
-
-			className = 'align' + imageData.align;
-			id = imageData.attachment_id ? 'id="attachment_'+ imageData.attachment_id +'" ' : '';
-
-			// should create a new function for generating the caption markup
-			html =  '<dl ' + id + 'class="wp-caption '+ className +'" style="width: '+ width +'px">' +
-				'<dt class="wp-caption-dt">'+ html + '</dt><dd class="wp-caption-dd">'+ imageData.caption +'</dd></dl>';
-
-			node = editor.dom.create( 'div', { 'class': 'mceTemp' }, html );
-		} else {
-			node = createImageAndLink( imageData, 'node' );
-		}
-
-		nodeToReplace = imageNode;
-
-		captionNode = editor.dom.getParent( imageNode, '.mceTemp' );
-
-		if ( captionNode ) {
-			nodeToReplace = captionNode;
-		} else {
-			if ( imageNode.parentNode.nodeName === 'A' ) {
-				nodeToReplace = imageNode.parentNode;
-			}
-		}
-
-		uid = editor.dom.uniqueId( 'wp_' );
-		editor.dom.setAttrib( node, 'data-wp-replace-id', uid );
-		editor.dom.replace( node, nodeToReplace );
-
-		// find the updated node
-		node = editor.dom.select( '[data-wp-replace-id="' + uid + '"]' )[0];
-
-		editor.dom.setAttrib( node, 'data-wp-replace-id', '' );
-
-		editor.nodeChanged();
-
-		editedImg = node.nodeName === 'IMG' ? node : editor.dom.select( 'img', node )[0];
-
-		if ( editedImg ) {
-			editor.selection.select( editedImg );
-			// refresh toolbar
-			addToolbar( editedImg );
-		}
-	}
-
-	function createImageAndLink( imageData, mode ) {
-		var classes = tinymce.explode( imageData.extraClasses, ' ' ),
-			attrs, linkAttrs;
-
-		mode = mode ? mode : 'node';
+		classes = tinymce.explode( imageData.extraClasses, ' ' );
 
 		if ( ! classes ) {
 			classes = [];
@@ -278,42 +222,75 @@ tinymce.PluginManager.add( 'wpeditimage', function( editor ) {
 			width: imageData.width,
 			height: imageData.height,
 			alt: imageData.alt,
-			title: imageData.title || null
+			title: imageData.title || null,
+			'class': classes.join( ' ' )
 		};
 
-		if ( classes.length ) {
-			attrs['class'] = classes.join( ' ' );
+		dom.setAttribs( imageNode, attrs );
+
+		linkAttrs = {
+			href: imageData.linkUrl,
+			rel: imageData.linkRel || null,
+			target: imageData.linkTargetBlank ? '_blank': null,
+			'class': imageData.linkClassName || null
+		};
+
+		if ( imageNode.parentNode.nodeName === 'A' ) {
+			if ( imageData.linkUrl ) {
+				dom.setAttribs( imageNode.parentNode, linkAttrs );
+			} else {
+				dom.remove( imageNode.parentNode, true );
+			}
+		} else if ( imageData.linkUrl ) {
+			html = dom.createHTML( 'a', linkAttrs, dom.getOuterHTML( imageNode ) );
+			dom.outerHTML( imageNode, html );
 		}
 
-		if ( imageData.linkUrl ) {
+		if ( imageData.caption ) {
+			captionNode = editor.dom.getParent( imageNode, '.mceTemp' );
+			width = parseInt( imageData.width, 10 );
+			id = imageData.attachment_id ? 'id="attachment_'+ imageData.attachment_id +'" ' : '';
+			className = 'wp-caption align' + imageData.align;
 
-			linkAttrs = {
-				href: imageData.linkUrl
-			};
-
-			if ( imageData.linkRel ) {
-				linkAttrs.rel = imageData.linkRel;
+			if ( ! editor.getParam( 'wpeditimage_html5_captions' ) ) {
+				width += 10;
 			}
 
-			if ( imageData.linkTargetBlank ) {
-				linkAttrs.target = '_blank';
-			}
+			if ( captionNode ) {
+				dl = dom.select( 'dl.wp-caption', captionNode );
 
-			if ( imageData.linkClassName ) {
-				linkAttrs['class'] = imageData.linkClassName;
-			}
+				if ( dl.length ) {
+					dom.setAttribs( dl, {
+						id: id,
+						'class': className,
+						style: 'width: ' + width + 'px'
+					} );
+				}
 
-			if ( mode === 'node' ) {
-				return editor.dom.create( 'a', linkAttrs, editor.dom.createHTML( 'img', attrs ) );
-			} else if ( mode === 'html' ) {
-				return editor.dom.createHTML( 'a', linkAttrs, editor.dom.createHTML( 'img', attrs ) );
-			}
+				dd = dom.select( '.wp-caption-dd', captionNode );
 
-		} else if ( mode === 'node' ) {
-			return editor.dom.create( 'img', attrs );
-		} else if ( mode === 'html' ) {
-			return editor.dom.createHTML( 'img', attrs );
+				if ( dd.length ) {
+					dom.setHTML( dd[0], imageData.caption );
+				}
+
+			} else {
+
+				if ( imageNode.parentNode.nodeName === 'A' ) {
+					node = imageNode.parentNode;
+				} else {
+					node = imageNode;
+				}
+
+				// should create a new function for generating the caption markup
+				html =  '<div class="mceTemp"><dl ' + id + 'class="' + className +'" style="width: '+ width +'px">' +
+					'<dt class="wp-caption-dt">'+ dom.getOuterHTML( node ) + '</dt><dd class="wp-caption-dd">'+ imageData.caption +'</dd></dl></div>';
+				dom.setOuterHTML( node, html );
+			}
 		}
+
+		editor.nodeChanged();
+		// refresh the toolbar
+		addToolbar( imageNode );
 	}
 
 	function editImage( img ) {
