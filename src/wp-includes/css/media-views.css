@@ -1608,7 +1608,8 @@
 }
 
 .image-details .column-settings {
-	background: #F3F3F3;
+	background: #f3f3f3;
+	border-right: 1px solid #ddd;
 	min-height: 100%;
 	width: 52%;
 	position: absolute;
@@ -1617,7 +1618,8 @@
 }
 
 .image-details .column-settings h3 {
-	padding: 20px 0 0 20px;
+	margin: 20px;
+	padding-top: 20px;
 	border-top: 1px solid #ddd;
 }
 
