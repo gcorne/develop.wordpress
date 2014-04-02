@@ -6137,12 +6137,17 @@
 		},
 
 		syncCustomSize: function( event ) {
-			var dimension = $( event.target ).data('setting');
+			var dimension = $( event.target ).data('setting'),
+				value;
 
 			if ( dimension === 'customWidth' ) {
-				this.$( '[data-setting="customHeight"]' ).val( Math.round( 1 / this.model.get( 'aspectRatio' ) * $( event.target ).val() ) );
+				value = Math.round( 1 / this.model.get( 'aspectRatio' ) * $( event.target ).val() );
+				this.model.set( 'customHeight', value, { silent: true } );
+				this.$( '[data-setting="customHeight"]' ).val( value );
 			} else {
-				this.$( '[data-setting="customWidth"]' ).val( Math.round( this.model.get( 'aspectRatio' ) * $( event.target ).val() ) );
+				value = Math.round( this.model.get( 'aspectRatio' ) * $( event.target ).val() );
+				this.$( '[data-setting="customWidth"]' ).val( value );
+				this.model.set( 'customWidth', value, { silent: true } );
 			}
 		},
 
