@@ -751,7 +751,7 @@ function wp_print_media_templates() {
 						<input type="text" class="link-to-custom" data-setting="linkUrl" />
 					</div>
 					<div class="advanced">
-						<a class="advanced-toggle" href="#"><?php _e('Show advanced options'); ?></a>
+						<h3><a class="advanced-toggle" href="#"><?php _e('Advanced Options'); ?></a></h3>
 						<div class="hidden">
 							<label class="setting title-text">
 								<span><?php _e('Image Title Attribute'); ?></span>
