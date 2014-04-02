@@ -705,18 +705,25 @@ function wp_print_media_templates() {
 										'full'      => __('Full Size'),
 									) );
 
+
 									foreach ( $sizes as $value => $name ) : ?>
 										<#
 										var size = data.sizes['<?php echo esc_js( $value ); ?>'];
 										if ( size ) { #>
-											<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, 'full' ); ?>>
+											<option value="<?php echo esc_attr( $value ); ?>">
 												<?php echo esc_html( $name ); ?> &ndash; {{ size.width }} &times; {{ size.height }}
 											</option>
 										<# } #>
 									<?php endforeach; ?>
+									<option value="<?php echo esc_attr( 'custom' ); ?>">
+										<?php _e( 'Custom' ); ?>
+									</option>
 								</select>
 							</label>
-						<# } #>
+							<# } #>
+							<div class="custom-size<# if ( data.model.size !== 'custom' ) { #> hidden<# } #>">
+								<label><span><?php _e( 'Width' ); ?> <small>(px)</small></span> <input data-setting="customWidth" type="number" step="1" value="{{ data.model.customWidth }}" /></label><span class="sep">&times;</span><label><span><?php _e( 'Height' ); ?> <small>(px)</small></span><input data-setting="customHeight" type="number" step="1" value="{{ data.model.customHeight }}" /></label>
+							</div>
 					<# } #>
 
 					<div class="setting link-to">
