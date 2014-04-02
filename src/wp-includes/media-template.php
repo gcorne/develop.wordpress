@@ -689,7 +689,7 @@ function wp_print_media_templates() {
 
 					<# if ( data.attachment ) { #>
 						<# if ( 'undefined' !== typeof data.attachment.sizes ) { #>
-							<label class="setting">
+							<label class="setting size">
 								<span><?php _e('Size'); ?></span>
 								<select class="size" name="size"
 									data-setting="size"
@@ -716,7 +716,7 @@ function wp_print_media_templates() {
 										<# } #>
 									<?php endforeach; ?>
 									<option value="<?php echo esc_attr( 'custom' ); ?>">
-										<?php _e( 'Custom' ); ?>
+										<?php _e( 'Custom Size' ); ?>
 									</option>
 								</select>
 							</label>

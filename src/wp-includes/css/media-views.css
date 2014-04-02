@@ -1661,6 +1661,10 @@
 	margin-top: 0;
 }
 
+.image-details .embed-media-settings .size {
+	margin-bottom: 4px;
+}
+
 .image-details .custom-size span {
 	display: block;
 }
@@ -1668,6 +1672,11 @@
 .image-details .custom-size label {
 	display: block;
 	float: left;
+}
+
+.image-details .custom-size span small {
+	color: #999;
+	font-size: inherit;
 }
 
 .image-details .custom-size input {
